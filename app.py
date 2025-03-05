@@ -26,7 +26,8 @@ def add_video_page():
         video_url = data.get("video_url")
         captions_url = data.get("captions_url")
         file_name = data.get("file_name")
-        language = data.get("language", "en")
+        language_code = data.get("language_code", "en")
+        language_label = data.get("language_label", "English")
         original_video_url = data.get("original_video_url")
 
         html_content = render_template(
@@ -34,7 +35,8 @@ def add_video_page():
             video_url=video_url,
             captions_url=captions_url,
             original_video_url=original_video_url,
-            language=language,
+            language_code=language_code,
+            language_label=language_label,
         )
 
         output_dir = "pages"

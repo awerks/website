@@ -9,8 +9,7 @@
     <meta name="description" property="og:description"
         content="Captionyx - Your go-to Telegram bot for generating and translating subtitles effortlessly.">
     <meta name="author" content="Captionyx">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta property="og:title" content="Captionyx - Generate and Translate Subtitles on Telegram">
     <meta property="og:description"
         content="Effortlessly generate and translate subtitles for your videos with Captionyx, the Telegram bot you didn't know you needed.">
@@ -83,7 +82,8 @@
             <div id="container">
                 <video controls crossorigin playsinline id="player">
                     <source src="{{ video_url }}" type="video/mp4">
-                    <track kind="captions" label="English" srclang="{{ language }}" src="{{ captions_url }}" default>
+                    <track kind="captions" label="{{ language_label }}" srclang="{{ language_code }}"
+                        src="{{ captions_url }}" default>
                 </video>
             </div>
             <ul>
@@ -95,7 +95,7 @@
 
         </main>
     </div>
-    <aside>
+    <!-- <aside>
         <svg class="icon">
             <title>Twitter</title>
             <path
@@ -111,7 +111,7 @@
                 target="_blank" class="link js-shr">tweet it</a>
             👍
         </p>
-    </aside>
+    </aside> -->
 
 
     <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
@@ -124,7 +124,7 @@
         const player = new Plyr('#player', {
             controls,
             speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
-            captions: { active: true, update: false, language: '{{ language }}' }
+            captions: { active: true, update: false, language: '{{ language_code }}' }
             //previewThumbnails: { enabled: true, src: 'https://d1144ayudkrvmu.cloudfront.net/thumbnails.vtt' }
         });
     </script>

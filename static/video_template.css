@@ -316,7 +316,7 @@ body {
 
 .grid {
     flex: 1;
-    overflow: auto
+    overflow: auto;
 }
 
 main {
@@ -424,8 +424,8 @@ h1 {
 .button,
 .button__count {
     border: 0;
-    border-radius: 6px;
-    padding: 12px;
+    border-radius: 0.5rem;
+    padding: 1rem;
     position: relative;
     text-shadow: none;
     -webkit-user-select: none;
