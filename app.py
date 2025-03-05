@@ -5,6 +5,7 @@ from functools import wraps
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
 FLASK_API_TOKEN = os.getenv("FLASK_API_TOKEN", "dev")
+MOUNT_DIRECTORY = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
 
 
 def require_auth(f):
@@ -39,9 +40,7 @@ def add_video_page():
             language_label=language_label,
         )
 
-        output_dir = "pages"
-        os.makedirs(output_dir, exist_ok=True)
-        output_path = os.path.join(output_dir, f"{file_name}.html")
+        output_path = os.path.join(MOUNT_DIRECTORY, f"{file_name}.html")
         with open(output_path, "w") as f:
             f.write(html_content)
     except Exception as e:
@@ -52,7 +51,7 @@ def add_video_page():
 
 @app.route("/result/<path:name>", methods=["GET"])
 def serve_rendered_page(name):
-    return send_from_directory("pages", f"{name}.html")
+    return send_from_directory(MOUNT_DIRECTORY, f"{name}.html")
 
 
 @app.route("/", methods=["GET"])
