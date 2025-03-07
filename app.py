@@ -7,11 +7,11 @@ import google.oauth2.id_token
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
-app.secret_key = os.getenv("FLASK_API_TOKEN", "dev")
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev")
+app.config["SESSION_COOKIE_DOMAIN"] = ".captionyx.com"
 
 FLASK_API_TOKEN = os.getenv("FLASK_API_TOKEN", "dev")
 MOUNT_DIRECTORY = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
-GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 BOT_TOKEN = os.getenv("TOKEN")
 
 

@@ -78,7 +78,8 @@
                 <a href="/privacy" style="margin-right: 15px;">Privacy</a>
 
                 {% if 'user_id' not in session %}
-                <a href="/login" style="margin-right: 15px;">Login</a>
+                <!-- solving subdomain issue (can't add more than one domain) -->
+                <a href="https://captionyx.com/login" style="margin-right: 15px;">Login</a>
                 {% else %}
                 <a href="/dashboard" style="margin-right: 15px;">Dashboard</a>
 
