@@ -64,5 +64,20 @@ def video():
     return render_template("video_template.html")
 
 
+@app.route("/about", methods=["GET"])
+def about():
+    return render_template("about.html")
+
+
+@app.route("/privacy", methods=["GET"])
+def privacy():
+    return render_template("privacy.html")
+
+
+@app.route("/login", methods=["GET"])
+def login():
+    return render_template("login.html")
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=os.getenv("PORT", default=5000))
