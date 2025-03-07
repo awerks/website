@@ -23,11 +23,13 @@
     {% block extra_head %}{% endblock %}
 
     <script>
-        const userPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (userPrefersDark) {
-            document.documentElement.setAttribute('data-theme', 'dark');
+        const themeKey = 'user-theme';
+        if (storedTheme) {
+            document.documentElement.setAttribute('data-theme', storedTheme);
+            const storedTheme = localStorage.getItem(themeKey);
         } else {
-            document.documentElement.setAttribute('data-theme', 'light');
+            const userPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.setAttribute('data-theme', userPrefersDark ? 'dark' : 'light');
         }
 
         function updateThemeIcon() {
@@ -44,11 +46,9 @@
         }
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute('data-theme');
-            if (currentTheme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'light');
-            } else {
-                document.documentElement.setAttribute('data-theme', 'dark');
-            }
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem(themeKey, newTheme);
             updateThemeIcon();
         }
         document.addEventListener('DOMContentLoaded', updateThemeIcon);
@@ -80,11 +80,11 @@
     {% block content %}{% endblock %}
 
     <footer>
-        <div class="container">
-            <p>&copy; 2025 Captionyx. All rights reserved.</p>
+        <div class="container footer-container">
+            <p>&copy; 2025 Captionyx.</p>
             <p>
                 <a href="https://github.com/awerks/captionyx" target="_blank" class="github-link">
-                    <i class="fab fa-github"></i> View on GitHub
+                    <i class="fab fa-github"></i> GitHub
                 </a>
 
             </p>
