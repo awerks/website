@@ -1,14 +1,53 @@
 import os
-from flask import Flask, jsonify, request, send_from_directory, render_template, abort
+from flask import Flask, jsonify, request, send_from_directory, render_template, abort, redirect, url_for
 from functools import wraps
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
 FLASK_API_TOKEN = os.getenv("FLASK_API_TOKEN", "dev")
 MOUNT_DIRECTORY = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
+BOT_TOKEN = os.getenv("TOKEN")
+import hashlib
+import hmac
+from flask import request
 
 
-def require_auth(f):
+def verify_telegram_auth(data, bot_token):
+    received_hash = data.pop("hash")
+
+    data_check_string = "\n".join(f"{k}={data[k]}" for k in sorted(data.keys()))
+
+    secret_key = hashlib.sha256(bot_token.encode()).digest()
+
+    computed_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
+
+    return computed_hash == received_hash
+
+
+@app.route("/telegram-login", methods=["POST"])
+def telegram_login():
+
+    user = request.get_json()
+    print(user)
+    if not user:
+        return jsonify(error="No data received"), 400
+
+    verification_data = user.copy()
+
+    if verify_telegram_auth(verification_data, BOT_TOKEN):
+        print("User authenticated successfully")
+        return redirect(url_for("dashboard", user=user))
+    else:
+        return jsonify(error="Invalid Telegram data"), 403
+
+
+@app.route("/dashboard", methods=["GET"])
+def dashboard():
+    user = request.args.get("user")
+    return render_template("dashboard.html", user=user)
+
+
+def require_token(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.headers.get("Authorization")
@@ -20,7 +59,7 @@ def require_auth(f):
 
 
 @app.route("/add_video_page", methods=["POST"])
-@require_auth
+@require_token
 def add_video_page():
     try:
         data = request.get_json()

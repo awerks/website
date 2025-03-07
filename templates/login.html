@@ -4,6 +4,23 @@
 <main class="section">
     <h1>Login</h1>
     <!-- under development -->
-    <p>Login functionality is under development. Come back later!</p>
+    <p style="margin-bottom: 2rem;">Login functionality is under development. Come back later!</p>
+    <script async src="https://telegram.org/js/telegram-widget.js?7" data-telegram-login="SubtitlesGeneratorBot"
+        data-size="large" data-userpic="false" data-request-access="write" data-onauth="onTelegramAuth(user)">
+        </script>
+
+    <script>
+        function onTelegramAuth(user) {
+            fetch('/telegram-login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
 </main>
+
 {% endblock %}
