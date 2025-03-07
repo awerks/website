@@ -1,8 +1,14 @@
+#features {
+    text-align: center;
+}
+
+
 .get-started {
     padding: 40px;
     border-radius: 8px;
     text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background: var(--card-bg);
+    /* box-shadow: var(--card-shadow); */
     transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -31,15 +37,21 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-
+/* Coming Soon section uses a dashed border with the primary color */
 .coming-soon {
-    background: #f9f9ff;
+    background: var(--card-bg);
     border: 1px dashed var(--primary);
     padding: 20px;
     text-align: center;
     border-radius: 8px;
     font-size: 1.3rem;
-    background-color: var(--background);
     color: var(--text);
     margin-top: 30px;
+}
+
+/* Dark mode adjustments for elements that need a bit more contrast */
+:root[data-theme="dark"] .bot-placeholder .placeholder {
+    background: #2a2a2a;
+    /* Darker placeholder background */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7);
 }

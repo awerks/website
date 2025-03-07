@@ -28,7 +28,6 @@
         const userPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (storedTheme) {
             document.documentElement.setAttribute('data-theme', storedTheme);
-
         }
         else if (userPrefersDark) {
             document.documentElement.setAttribute('data-theme', 'dark');
@@ -89,12 +88,10 @@
 
     <footer>
         <div class="container footer-container">
-            <p>&copy; 2025 Captionyx.</p>
-            <p>
+            <p>&copy; 2025 Captionyx. &nbsp;&nbsp;
                 <a href="https://github.com/awerks/captionyx" target="_blank" class="github-link">
                     <i class="fab fa-github"></i> GitHub
                 </a>
-
             </p>
         </div>
     </footer>

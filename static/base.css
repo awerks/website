@@ -4,6 +4,7 @@
     --primary: #336151;
     --secondary: #85ccb3;
     --accent: #34a27b;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 :root[data-theme="dark"] {
@@ -12,6 +13,8 @@
     --primary: #9eccbc;
     --secondary: #337a61;
     --accent: #5dcba4;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+    /* Deeper shadow */
 }
 
 
@@ -30,20 +33,6 @@ body {
     display: flex;
     flex-direction: column;
     transition: background 0.3s ease, color 0.3s ease;
-}
-
-main {
-    flex: 1;
-}
-
-html,
-body {
-    height: 100%;
-}
-
-a {
-    text-decoration: none;
-    color: inherit;
 }
 
 
@@ -72,13 +61,24 @@ header {
 }
 
 main {
-    max-width: 900px;
+    flex: 1;
+    max-width: 1000px;
     background: var(--card-bg);
     padding: 60px 20px;
     border-radius: 8px;
     box-shadow: var(--card-shadow);
     transition: background 0.3s ease, box-shadow 0.3s ease;
-    margin: 5rem auto 0;
+    margin: 10rem auto 0;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
 }
 
 main section {
@@ -102,8 +102,9 @@ main section ul {
 main section ul li {
     margin-bottom: 12px;
     font-size: 1.1rem;
-    display: flex;
-    align-items: center;
+    /* display: flex; */
+
+    /* align-items: center;  */
 }
 
 main section ul li i {
@@ -126,7 +127,6 @@ main section p {
 
 .footer-container {
     justify-content: center;
-    gap: 2rem;
 }
 
 .logo {
@@ -229,7 +229,7 @@ footer a.github-link:hover {
         position: absolute;
         top: 70px;
         right: 20px;
-        background: var(--primary);
+        background: #2f3b38;
         flex-direction: column;
         gap: 10px;
         padding: 20px;
