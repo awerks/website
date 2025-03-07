@@ -66,7 +66,7 @@
     <header>
         <div class="container">
             <div class="logo">
-                <a href="/">Captionyx</a>
+                <a href="/">captionyx</a>
             </div>
             <input type="checkbox" id="nav-toggle" />
             <label for="nav-toggle" class="nav-toggle-label">
@@ -76,7 +76,15 @@
                 <a href="/#features" style="margin-right: 15px;">Features</a>
                 <a href="/about" style="margin-right: 15px;">About</a>
                 <a href="/privacy" style="margin-right: 15px;">Privacy</a>
+
+                {% if 'user_id' not in session %}
                 <a href="/login" style="margin-right: 15px;">Login</a>
+                {% else %}
+                <a href="/dashboard" style="margin-right: 15px;">Dashboard</a>
+
+                <a href="/logout" style="margin-right: 15px;">Logout</a>
+                {% endif %}
+
                 <a href="#" onclick="toggleTheme()" class="theme-toggle" title="Toggle Theme">
                     <i id="theme-toggle-icon" class="fas"></i>
                 </a>

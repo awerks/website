@@ -8,8 +8,6 @@ import google.oauth2.id_token
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.secret_key = os.getenv("FLASK_API_TOKEN", "dev")
-# app.register_blueprint(google_bp, url_prefix="/login")
-
 
 FLASK_API_TOKEN = os.getenv("FLASK_API_TOKEN", "dev")
 MOUNT_DIRECTORY = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
@@ -64,6 +62,19 @@ def google_login():
     return redirect(url_for("dashboard"))
 
 
+@app.route("/logout", methods=["GET"])
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+
+@app.route("/login", methods=["GET"])
+def login():
+    if "user_id" in session:
+        return redirect(url_for("dashboard"))
+    return render_template("login.html")
+
+
 @app.route("/dashboard", methods=["GET"])
 @require_auth
 def dashboard():
@@ -72,7 +83,6 @@ def dashboard():
     first_name = session.get("first_name")
     username = session.get("username")
     photo_url = session.get("photo_url")
-    print("IN DASHBOARD")
     return render_template("dashboard.html", first_name=first_name, id=user_id, username=username, photo_url=photo_url)
 
 
@@ -129,11 +139,6 @@ def about():
 @app.route("/privacy", methods=["GET"])
 def privacy():
     return render_template("privacy.html")
-
-
-@app.route("/login", methods=["GET"])
-def login():
-    return render_template("login.html")
 
 
 if __name__ == "__main__":

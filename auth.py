@@ -6,15 +6,6 @@ from functools import wraps
 from flask_dance.contrib.google import make_google_blueprint
 
 FLASK_API_TOKEN = getenv("FLASK_API_TOKEN", "dev)")
-# GOOGLE_CLIENT_ID = getenv("GOOGLE_CLIENT_ID")
-# GOOGLE_CLIENT_SECRET = getenv("GOOGLE_CLIENT_SECRET")
-
-# google_bp = make_google_blueprint(
-#     client_id=GOOGLE_CLIENT_ID,
-#     client_secret=GOOGLE_CLIENT_SECRET,
-#     scope=["profile", "email"],
-#     redirect_url="/google_login",
-# )
 
 
 def require_token(f):

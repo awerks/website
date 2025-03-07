@@ -178,7 +178,7 @@ nav a:hover {
     background: var(--primary);
     color: var(--background);
     padding: 15px 30px;
-    border-radius: 50px;
+    border-radius: 10px;
     font-size: 1rem;
     transition: background 0.3s ease;
     font-weight: 600;

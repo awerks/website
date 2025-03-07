@@ -27,7 +27,7 @@
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
         </div>
-        <button type="submit">Login</button>
+        <button type="submit" class="button">Login</button>
 
     </form>
     <div class="social-login-buttons">
@@ -64,7 +64,7 @@
                 })
                 .catch(error => console.error('Error:', error));
         }
-
+        // show icon on mobile, standard on desktop
         document.addEventListener("DOMContentLoaded", function () {
             var config = window.googleSignInConfig || { type: 'standard' };
             var googleButtonHTML =
