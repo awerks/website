@@ -78,7 +78,7 @@ main {
     border-radius: 8px;
     box-shadow: var(--card-shadow);
     transition: background 0.3s ease, box-shadow 0.3s ease;
-    margin: 4rem auto 0;
+    margin: 5rem auto 0;
 }
 
 main section {
@@ -174,7 +174,7 @@ nav a:hover {
     color: var(--background);
     padding: 15px 30px;
     border-radius: 50px;
-    font-size: 1.2rem;
+    font-size: 1rem;
     transition: background 0.3s ease;
     font-weight: 600;
     box-shadow: 0 4px 10px var(--primary);
