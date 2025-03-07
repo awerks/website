@@ -1,0 +1,62 @@
+  main.dashboard {
+      max-width: 900px;
+      padding: 2rem;
+      background: var(--card-bg, #fff);
+      border-radius: 8px;
+      box-shadow: var(--card-shadow, 0 4px 20px rgba(0, 0, 0, 0.1));
+  }
+
+  .dashboard-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+  }
+
+  .profile-card {
+      flex: 1 1 250px;
+      text-align: center;
+      background: var(--background, #f3f7f6);
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .profile-photo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 1rem;
+      border: 3px solid var(--primary);
+  }
+
+  .profile-card h2 {
+      margin: 0.5rem 0;
+      font-size: 1.5rem;
+      color: var(--primary);
+  }
+
+  .profile-card p {
+      margin: 0.3rem 0;
+      font-size: 1rem;
+      color: var(--text);
+  }
+
+  .dashboard-content {
+      flex: 2 1 400px;
+      padding: 1.5rem;
+      background: var(--background, #f3f7f6);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .dashboard-content p {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+  }
+
+  @media (max-width: 768px) {
+      .dashboard-container {
+          flex-direction: column;
+      }
+  }

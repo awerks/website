@@ -1,30 +1,20 @@
-import json
 import os
-import hashlib
-import hmac
-from flask import Flask, jsonify, request, send_from_directory, render_template, abort, redirect, session, url_for
-from functools import wraps
+from flask import Flask, jsonify, request, send_from_directory, render_template, redirect, session, url_for
 from werkzeug.middleware.proxy_fix import ProxyFix
+from auth import require_token, require_auth, verify_telegram_auth
+import google.auth.transport.requests
+import google.oauth2.id_token
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
-app.secret_key = os.environ.get("FLASK_API_TOKEN", "dev")
+app.secret_key = os.getenv("FLASK_API_TOKEN", "dev")
+# app.register_blueprint(google_bp, url_prefix="/login")
+
 
 FLASK_API_TOKEN = os.getenv("FLASK_API_TOKEN", "dev")
 MOUNT_DIRECTORY = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 BOT_TOKEN = os.getenv("TOKEN")
-
-
-def verify_telegram_auth(data, bot_token):
-    received_hash = data.pop("hash")
-
-    data_check_string = "\n".join(f"{k}={data[k]}" for k in sorted(data.keys()))
-
-    secret_key = hashlib.sha256(bot_token.encode()).digest()
-
-    computed_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
-
-    return computed_hash == received_hash
 
 
 @app.route("/telegram-login", methods=["POST"])
@@ -52,37 +42,38 @@ def telegram_login():
         return jsonify(error="Invalid Telegram data"), 403
 
 
+@app.route("/google_login", methods=["POST"])
+def google_login():
+
+    token = request.form.to_dict()["credential"]
+    try:
+        request_adapter = google.auth.transport.requests.Request()
+        user = google.oauth2.id_token.verify_oauth2_token(token, request_adapter)
+        session.update(
+            {
+                "user_id": user["sub"],
+                "first_name": user["given_name"],
+                "username": user["email"],
+                "photo_url": user["picture"],
+            }
+        )
+    except Exception as e:
+        print("Error decoding token:", e)
+        return "Error decoding token", 400
+
+    return redirect(url_for("dashboard"))
+
+
 @app.route("/dashboard", methods=["GET"])
+@require_auth
 def dashboard():
-    # user = request.args.get("user")
-    # if not user:
-    #     return jsonify(error="No user data received"), 400
-    # try:
-    #     user = json.loads(user)
-    # except json.JSONDecodeError as e:
-    #     return jsonify(error="Error parsing user data"), 400
-    # user_id = user.get("id")
-    # first_name = user.get("first_name")
-    # username = user.get("username")
-    # photo_url = user.get("photo_url")
+
     user_id = session.get("user_id")
     first_name = session.get("first_name")
     username = session.get("username")
     photo_url = session.get("photo_url")
-
-    print(user_id, first_name, username, photo_url)
+    print("IN DASHBOARD")
     return render_template("dashboard.html", first_name=first_name, id=user_id, username=username, photo_url=photo_url)
-
-
-def require_token(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = request.headers.get("Authorization")
-        if token != FLASK_API_TOKEN:
-            abort(401)
-        return f(*args, **kwargs)
-
-    return decorated
 
 
 @app.route("/add_video_page", methods=["POST"])

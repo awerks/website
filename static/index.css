@@ -37,7 +37,6 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Coming Soon section uses a dashed border with the primary color */
 .coming-soon {
     background: var(--card-bg);
     border: 1px dashed var(--primary);
@@ -49,9 +48,7 @@
     margin-top: 30px;
 }
 
-/* Dark mode adjustments for elements that need a bit more contrast */
 :root[data-theme="dark"] .bot-placeholder .placeholder {
     background: #2a2a2a;
-    /* Darker placeholder background */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7);
 }

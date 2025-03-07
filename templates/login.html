@@ -1,13 +1,46 @@
 {% extends "base.html" %}
 {% block title %}Login{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="/static/login.css">
+<script>
+    (function () {
+        var buttonType = window.innerWidth < 600 ? 'icon' : 'standard';
+        window.googleSignInConfig = {
+            type: buttonType,
+        };
+    })();
+</script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+{% endblock %}
+
+
 {% block content %}
 <main class="section">
-    <h1>Login</h1>
-    <!-- under development -->
-    <p style="margin-bottom: 2rem;">Login functionality is under development. Come back later!</p>
-    <script async src="https://telegram.org/js/telegram-widget.js?7" data-telegram-login="SubtitlesGeneratorBot"
-        data-size="large" data-userpic="false" data-request-access="write" data-onauth="onTelegramAuth(user)">
-        </script>
+    <h1 style="text-align: center;">Login</h1>
+    <form action="{{ url_for('login') }}" method="post">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Login</button>
+
+    </form>
+    <div class="social-login-buttons">
+        <div class="social-button" id="telegram-login-button">
+            <script async src="https://telegram.org/js/telegram-widget.js?7" data-telegram-login="SubtitlesGeneratorBot"
+                data-size="large" data-userpic="false" data-request-access="write" data-onauth="onTelegramAuth(user)">
+                </script>
+        </div>
+
+        <div class="social-button" id="google-login-button">
+            <div id="google-signin-container"></div>
+        </div>
+    </div>
 
     <script>
         function onTelegramAuth(user) {
@@ -31,6 +64,26 @@
                 })
                 .catch(error => console.error('Error:', error));
         }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var config = window.googleSignInConfig || { type: 'standard' };
+            var googleButtonHTML =
+                '<div id="g_id_onload" ' +
+                'data-client_id="612951769125-keb4f56moc9g8il5vs8ks040hcdkmnfq.apps.googleusercontent.com" ' +
+                'data-login_uri="https://captionyx.com/google_login" ' +
+                'data-auto_prompt="false">' +
+                '</div>' +
+                '<div class="g_id_signin" ' +
+                'data-type="' + config.type + '" ' +
+                'data-size=large"' +
+                'data-theme="outline" ' +
+                'data-text="sign_in_with" ' +
+                'data-shape="circle" ' +
+                'data-logo_alignment="left">' +
+                'data-ux_mode="redirect"' +
+                '</div>';
+            document.getElementById('google-signin-container').innerHTML = googleButtonHTML;
+        });
     </script>
 </main>
 

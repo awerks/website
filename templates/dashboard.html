@@ -2,9 +2,27 @@
 
 {% block title %}Dashboard{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="/static/dashboard.css">
+
+{% endblock %}
 
 {% block content %}
+<main class="dashboard">
+    <div class="dashboard-container">
+        <div class="profile-card">
+            {% if photo_url %}
+            <img src="{{ photo_url }}" alt="{{ first_name }}'s profile photo" class="profile-photo">
+            {% else %}
+            <img src="/static/images/default-profile.png" alt="Default profile photo" class="profile-photo">
+            {% endif %}
+            <h2>{{ first_name }} {{ username }}</h2>
+            <p>ID: {{ id }}</p>
+        </div>
 
-<p>Hello, {{ first_name }} {{ username }}. ID: {{ id }}</p>
-<p>YESS</p>
+        <div class="dashboard-content">
+            <p>Welcome to your dashboard! Here you can view your stats, manage your settings, and more.</p>
+        </div>
+    </div>
+</main>
 {% endblock %}
