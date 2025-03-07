@@ -56,7 +56,12 @@ def serve_rendered_page(name):
 
 @app.route("/", methods=["GET"])
 def serve_index():
-    return send_from_directory("static", "index.html")
+    return render_template("index.html")
+
+
+@app.route("/video", methods=["GET"])
+def video():
+    return render_template("video_template.html")
 
 
 if __name__ == "__main__":

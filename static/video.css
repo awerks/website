@@ -1,0 +1,128 @@
+.video-page-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    margin-top: 5rem;
+    padding: 2rem 1rem;
+    text-align: center;
+}
+
+.video-page-container h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.video-page-container p {
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+}
+
+.video-page-container .cta-buttons {
+    margin: 1.5rem 0;
+}
+
+.video-page-container .button {
+    display: inline-block;
+    margin: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    color: #fff;
+    background-color: var(--primary);
+    border-radius: 4px;
+    transition: background 0.3s ease;
+    font-weight: 600;
+}
+
+.video-page-container .button.support-button {
+    background-color: var(--accent);
+}
+
+.video-page-container .button:hover {
+    background-color: var(--accent);
+}
+
+.video-page-container .button.support-button:hover {
+    background-color: var(--primary);
+}
+
+.video-wrapper {
+    max-width: 800px;
+    margin: 1.5rem auto;
+    background: #000;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.video-wrapper video {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.original-video-link {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+@media (min-width: 480px) {
+    .plyr__captions {
+        font-size: 13px;
+        font-size: var(--plyr-font-size-base, 15px);
+        padding: 20px;
+        padding: calc(var(--plyr-control-spacing, 10px) * 2)
+    }
+}
+
+@media (min-width: 768px) {
+    .plyr__captions {
+        font-size: 21px;
+        font-size: var(--plyr-font-size-large, 18px)
+    }
+}
+
+@media (min-width: 1024px) {
+    .plyr--fullscreen-fallback .plyr__captions {
+        font-size: 21px;
+        font-size: var(--plyr-font-size-xlarge, 21px)
+    }
+}
+
+@media only screen and (max-width: 875px) {
+
+    .plyr__controls [data-plyr="mute"],
+    .plyr__controls [data-plyr="volume"] {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+
+    header p {
+        font-size: 1rem;
+    }
+
+    .button {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    #container {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.75rem;
+    }
+
+    header p {
+        font-size: 0.9rem;
+    }
+
+    .call-to-action {
+        flex-direction: column;
+    }
+}

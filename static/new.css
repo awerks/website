@@ -1,0 +1,221 @@
+:root {
+    --text: #101413;
+    --background: #f3f7f6;
+    --primary: #336151;
+    --secondary: #85ccb3;
+    --accent: #34a27b;
+
+}
+
+:root[data-theme="dark"] {
+    --text: #ebefee;
+    --background: #080c0b;
+    --primary: #205542;
+    --secondary: #337a61;
+    --accent: #5dcba4;
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+
+body {
+    /* Updated to use Inter font */
+    font-family: 'Poppins', sans-serif;
+    color: var(--text);
+    background-color: var(--background);
+    line-height: 1.6;
+    padding: 1rem;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/*=========================================================================
+  Layout Container (.grid)
+=========================================================================*/
+
+.grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/*=========================================================================
+  Header Section
+=========================================================================*/
+
+header {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    /* Using gradient text */
+    background: var(--linearPrimarySecondary);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+header p {
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+}
+
+/*=========================================================================
+  Call-to-Action & Buttons
+=========================================================================*/
+
+.call-to-action {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.button--with-count {
+    position: relative;
+}
+
+/* Base button style */
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+    color: #fff;
+    background: var(--primary);
+}
+
+/* Hover state for buttons */
+.button:hover {
+    background: var(--accent);
+}
+
+/* Special style for the Support Us button */
+.support-us .button {
+    background: var(--secondary);
+}
+
+.support-us .button:hover {
+    background: var(--accent);
+}
+
+/*=========================================================================
+  Main Content & Video Container
+=========================================================================*/
+
+main {
+    width: 100%;
+    padding: 1rem;
+}
+
+#container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#player {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.original-video {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+
+
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+
+    header p {
+        font-size: 1rem;
+    }
+
+    .button {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    #container {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.75rem;
+    }
+
+    header p {
+        font-size: 0.9rem;
+    }
+
+    .call-to-action {
+        flex-direction: column;
+    }
+}
+
+@media (min-width: 480px) {
+    .plyr__captions {
+        font-size: 13px;
+        font-size: var(--plyr-font-size-base, 15px);
+        padding: 20px;
+        padding: calc(var(--plyr-control-spacing, 10px) * 2)
+    }
+}
+
+@media (min-width: 768px) {
+    .plyr__captions {
+        font-size: 21px;
+        font-size: var(--plyr-font-size-large, 18px)
+    }
+}
+
+@media (min-width: 1024px) {
+    .plyr--fullscreen-fallback .plyr__captions {
+        font-size: 21px;
+        font-size: var(--plyr-font-size-xlarge, 21px)
+    }
+}
+
+@media only screen and (max-width: 875px) {
+
+    .plyr__controls [data-plyr="mute"],
+    .plyr__controls [data-plyr="volume"] {
+        display: none !important;
+    }
+}

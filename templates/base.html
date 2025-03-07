@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Welcome to Captionyx - Generate and Translate Subtitles on Telegram" />
+    <title>{% block title %}Captionyx{% endblock %}</title>
+    <meta property="og:image" content="{{ url_for('static', filename='images/logo.png') }}">
+    <meta property="og:author" content="Captionyx">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}" />
+
+    {% block extra_head %}{% endblock %}
+
+    <script>
+        const userPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (userPrefersDark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+
+        function updateThemeIcon() {
+            const themeIcon = document.getElementById('theme-toggle-icon');
+            if (!themeIcon) return;
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+            updateThemeIcon();
+        }
+        document.addEventListener('DOMContentLoaded', updateThemeIcon);
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <a href="/">Captionyx</a>
+            </div>
+            <input type="checkbox" id="nav-toggle" />
+            <label for="nav-toggle" class="nav-toggle-label">
+                <i class="fas fa-bars"></i>
+            </label>
+            <nav>
+                <a href="/#features" style="margin-right: 15px;"><i class="fas fa-list"></i> Features</a>
+                <a href="/about" style="margin-right: 15px;"><i class="fas fa-info-circle"></i> About</a>
+                <a href="/policy" style="margin-right: 15px;"><i class="fas fa-user-shield"></i> Privacy</a>
+                <a href="/login" style="margin-right: 15px;"><i class="fas fa-sign-in-alt"></i> Login</a>
+                <a href="#" onclick="toggleTheme()" class="theme-toggle" title="Toggle Theme">
+                    <i id="theme-toggle-icon" class="fas"></i>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Captionyx. All rights reserved.</p>
+            <p>
+                <a href="https://github.com/awerks/captionyx" target="_blank" class="github-link">
+                    <i class="fab fa-github"></i> View on GitHub
+                </a>
+
+            </p>
+        </div>
+    </footer>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+
+</html>
