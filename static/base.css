@@ -73,12 +73,12 @@ header {
 
 main {
     max-width: 900px;
-    margin: 140px auto 40px;
     background: var(--card-bg);
     padding: 60px 40px;
     border-radius: 8px;
     box-shadow: var(--card-shadow);
     transition: background 0.3s ease, box-shadow 0.3s ease;
+    margin: 4rem auto 0;
 }
 
 main section {
