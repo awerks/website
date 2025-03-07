@@ -11,13 +11,24 @@
 
     <script>
         function onTelegramAuth(user) {
+            console.log("Telegram user:", user);
             fetch('/telegram-login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(user)
             })
+                .then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else {
+                        return response.json();
+                    }
+                })
+                .then(data => {
+                    if (data && data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                    }
+                })
                 .catch(error => console.error('Error:', error));
         }
     </script>

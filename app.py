@@ -1,15 +1,18 @@
+import json
 import os
-from flask import Flask, jsonify, request, send_from_directory, render_template, abort, redirect, url_for
+import hashlib
+import hmac
+from flask import Flask, jsonify, request, send_from_directory, render_template, abort, redirect, session, url_for
 from functools import wraps
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+app.secret_key = os.environ.get("FLASK_API_TOKEN", "dev")
 
 FLASK_API_TOKEN = os.getenv("FLASK_API_TOKEN", "dev")
 MOUNT_DIRECTORY = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
 BOT_TOKEN = os.getenv("TOKEN")
-import hashlib
-import hmac
-from flask import request
 
 
 def verify_telegram_auth(data, bot_token):
@@ -29,22 +32,46 @@ def telegram_login():
 
     user = request.get_json()
     print(user)
+    print(type(user))
     if not user:
         return jsonify(error="No data received"), 400
 
     verification_data = user.copy()
 
     if verify_telegram_auth(verification_data, BOT_TOKEN):
-        print("User authenticated successfully")
-        return redirect(url_for("dashboard", user=user))
+        session.update(
+            {
+                "user_id": user["id"],
+                "first_name": user["first_name"],
+                "username": user["username"],
+                "photo_url": user["photo_url"],
+            }
+        )
+        return redirect(url_for("dashboard"))
     else:
         return jsonify(error="Invalid Telegram data"), 403
 
 
 @app.route("/dashboard", methods=["GET"])
 def dashboard():
-    user = request.args.get("user")
-    return render_template("dashboard.html", user=user)
+    # user = request.args.get("user")
+    # if not user:
+    #     return jsonify(error="No user data received"), 400
+    # try:
+    #     user = json.loads(user)
+    # except json.JSONDecodeError as e:
+    #     return jsonify(error="Error parsing user data"), 400
+    # user_id = user.get("id")
+    # first_name = user.get("first_name")
+    # username = user.get("username")
+    # photo_url = user.get("photo_url")
+    user_id = session.get("user_id")
+    first_name = session.get("first_name")
+    username = session.get("username")
+    photo_url = session.get("photo_url")
+
+    print(user_id, first_name, username, photo_url)
+    return render_template("dashboard.html", first_name=first_name, id=user_id, username=username, photo_url=photo_url)
 
 
 def require_token(f):

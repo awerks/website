@@ -68,7 +68,7 @@ main {
     border-radius: 8px;
     /* box-shadow: var(--card-shadow); */
     transition: background 0.3s ease, box-shadow 0.3s ease;
-    margin: 10rem auto 0;
+    margin: 7rem auto 0;
 }
 
 html,
