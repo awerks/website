@@ -8,7 +8,6 @@ import google.oauth2.id_token
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev")
-app.config["SESSION_COOKIE_DOMAIN"] = ".captionyx.com"
 
 FLASK_API_TOKEN = os.getenv("FLASK_API_TOKEN", "dev")
 MOUNT_DIRECTORY = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
@@ -29,10 +28,10 @@ def telegram_login():
     if verify_telegram_auth(verification_data, BOT_TOKEN):
         session.update(
             {
-                "user_id": user["id"],
-                "first_name": user["first_name"],
-                "username": user["username"],
-                "photo_url": user["photo_url"],
+                "user_id": user.get("id"),
+                "first_name": user.get("first_name"),
+                "username": user.get("username"),  # not always present
+                "photo_url": user.get("photo_url"),
             }
         )
         return redirect(url_for("dashboard"))
@@ -49,10 +48,10 @@ def google_login():
         user = google.oauth2.id_token.verify_oauth2_token(token, request_adapter)
         session.update(
             {
-                "user_id": user["sub"],
-                "first_name": user["given_name"],
-                "username": user["email"],
-                "photo_url": user["picture"],
+                "user_id": user.get("sub"),
+                "first_name": user.get("given_name"),
+                "username": user.get("email"),
+                "photo_url": user.get("picture"),
             }
         )
     except Exception as e:
