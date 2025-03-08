@@ -9,6 +9,8 @@ from starlette.middleware.sessions import SessionMiddleware
 from auth import verify_telegram_auth, require_token_dependency, require_auth_dependency
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
 from database import User, Video
 import google.auth.transport.requests
 import google.oauth2.id_token
@@ -48,6 +50,13 @@ app.add_middleware(SessionMiddleware, secret_key=FASTAPI_SECRET_KEY)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
+
+
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 404:
+        return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
+    return await app.default_exception_handler(exc)
 
 
 @app.post("/telegram-login")

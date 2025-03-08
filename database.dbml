@@ -19,12 +19,14 @@ Table "videos" {
   "user_id" text [not null]
   "username" text
   "name" text
-  "link" text [not null]
+  "result_link" text [not null]
   "sent_time_utc" timestamp [not null]
   "duration_min" int4
   "resolution" text
   "selected_language" text
   "is_transcription" bool
+  "original_video_link" text
+  "thumbnail_url" text
 }
 
 Ref "videos_user_id_fkey":"users"."user_id" < "videos"."user_id"

@@ -8,7 +8,6 @@
 {% block content %}
 <main class="dashboard">
     <div class="dashboard-container">
-        <!-- Profile Card -->
         <div class="profile-card">
             {% if photo_url %}
             <img src="{{ photo_url }}" alt="{{ first_name }}'s profile photo" class="profile-photo">
@@ -23,11 +22,9 @@
             <p>ID: {{ id }}</p>
         </div>
 
-        <!-- Dashboard Content -->
         <div class="dashboard-content">
             <p>Welcome to your dashboard! Here you can view your stats, manage your settings, and more.</p>
 
-            <!-- Sorting Controls -->
             <div class="sorting-controls">
                 <span>Sort by:</span>
                 <a href="{{ request.url.include_query_params(sort_by='date') }}"
@@ -36,7 +33,6 @@
                     class="{% if sort_by == 'duration' %}active{% endif %}">Duration</a>
             </div>
 
-            <!-- Videos List -->
             <div class="videos-list">
                 <h3><i class="fas fa-video"></i> Your Videos</h3>
                 {% if videos %}
