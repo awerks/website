@@ -1,0 +1,30 @@
+Table "users" {
+  "user_id" text [pk, not null]
+  "username" text
+  "name" text
+  "start_time_utc" timestamp
+  "bot_language" text
+  "user_font_size" text
+  "user_font" text
+  "user_border_style" text
+  "default_language" text
+  "default_resolution" text
+  "transcribe" text
+  "subtitle_choice" text
+  "available_minutes" int4
+}
+
+Table "videos" {
+  "id" int4 [pk, not null, increment]
+  "user_id" text [not null]
+  "username" text
+  "name" text
+  "link" text [not null]
+  "sent_time_utc" timestamp [not null]
+  "duration_min" int4
+  "resolution" text
+  "selected_language" text
+  "is_transcription" bool
+}
+
+Ref "videos_user_id_fkey":"users"."user_id" < "videos"."user_id"
