@@ -75,7 +75,7 @@ def login():
 
 
 @app.route("/dashboard", methods=["GET"])
-@require_auth
+# @require_auth
 def dashboard():
 
     user_id = session.get("user_id")
@@ -83,9 +83,14 @@ def dashboard():
     username = session.get("username")
     photo_url = session.get("photo_url")
     #    # fake data for testing
-    #     user_id = "123456789"
-    #     first_name = "John"
-    #     username = "john_doe"
+
+    if app.debug:
+        # print(f"User ID: {user_id}")
+        # print(f"First Name: {first_name}")
+        # print(f"Username: {username}")
+        user_id = "123456789"
+        first_name = "John"
+        username = "john_doe"
     return render_template("dashboard.html", first_name=first_name, id=user_id, username=username, photo_url=photo_url)
 
 

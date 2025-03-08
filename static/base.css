@@ -5,6 +5,7 @@
     --secondary: #c7a4db;
     --accent: #ab72ca;
     --header: #985bb9;
+    --nav: #985bb9;
     --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
@@ -15,6 +16,7 @@
     --secondary: #47245b;
     --accent: #6e358d;
     --header: #c7a4db;
+    --nav: #2e1a3d;
     --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
     /* Deeper shadow */
 }
@@ -199,10 +201,10 @@ nav a:hover {
     /* background-color: var(--primary); */
 }
 
-:root[data-theme="dark"] .button:hover {
+/* :root[data-theme="dark"] .button:hover {
     transform: translateY(-1px);
     transition: transform 0.3s ease;
-}
+} */
 
 footer {
     text-align: center;
@@ -233,6 +235,7 @@ footer a.github-link:hover {
         top: 70px;
         right: 20px;
         background: #2f3b38;
+        background: var(--nav);
         flex-direction: column;
         gap: 10px;
         padding: 20px;
