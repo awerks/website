@@ -16,7 +16,11 @@
             {% else %}
             <img src="/static/images/default-profile.png" alt="Default profile photo" class="profile-photo">
             {% endif %}
+            {% if username %}
             <h2>{{ first_name }} {{ username }}</h2>
+            {% else %}
+            <h2>{{ first_name }}</h2>
+            {% endif %}
             <p>ID: {{ id }}</p>
         </div>
 
