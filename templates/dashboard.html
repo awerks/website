@@ -32,8 +32,13 @@
                     {% for video in videos %}
                     <div class="video-card">
                         <div class="video-thumb">
+
                             <a href="{{ video.result_link }}" target="_blank">
+                                {% if video.thumbnail_url %}
+                                <img src="{{ video.thumbnail_url }}" alt="{{ video.name }} thumbnail">
+                                {% else %}
                                 <img src="/static/images/video-placeholder.webp" alt="{{ video.name }} thumbnail">
+                                {% endif %}
                             </a>
                         </div>
                         <div class="video-info">

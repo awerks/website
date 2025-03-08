@@ -133,12 +133,20 @@ async def dashboard(
 
     print("User ID:", user_id)
     start_time = time.time()
-    query = await db.execute(select(Video).where(Video.user_id == user_id))
+    query = await db.execute(select(Video).where(Video.user_id == user_id).order_by(Video.sent_time_utc.desc()))
     videos = query.scalars().all()
     end_time = time.time()
     print(f"Query executed in {end_time - start_time} seconds")
+    # for video in videos:
+    #     if video.original_video_link and (
+    #         "youtube" in video.original_video_link or "youtu.be" in video.original_video_link
+    #     ):
+    #         video_id = video.original_video_link.split("v=")[-1].split("&")[0]
+    #         print("Video ID:", video_id)
+    #         video.thumbnail_url = f"https://img.youtube.com/vi/{video_id}/0.jpg"
 
     context = {
+        # request for base template always
         "request": request,
         "first_name": first_name,
         "id": user_id,

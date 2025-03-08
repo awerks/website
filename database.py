@@ -45,5 +45,5 @@ class Video(Base):
     resolution = Column(String)
     selected_language = Column(String)
     is_transcription = Column(Boolean)
-
+    thumbnail_url = Column(Text)
     user = relationship("User", back_populates="videos")
