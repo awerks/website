@@ -1,10 +1,8 @@
 {% extends "base.html" %}
-
 {% block title %}Dashboard{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="/static/dashboard.css">
-
 {% endblock %}
 
 {% block content %}
@@ -14,7 +12,7 @@
             {% if photo_url %}
             <img src="{{ photo_url }}" alt="{{ first_name }}'s profile photo" class="profile-photo">
             {% else %}
-            <img src="/static/images/default-profile.png" alt="Default profile photo" class="profile-photo">
+            <img src="/static/images/default-profile-image.webp" alt="Default profile photo" class="profile-photo">
             {% endif %}
             {% if username %}
             <h2>{{ first_name }} {{ username }}</h2>
@@ -26,6 +24,49 @@
 
         <div class="dashboard-content">
             <p>Welcome to your dashboard! Here you can view your stats, manage your settings, and more.</p>
+
+            <div class="videos-list">
+                <h3><i class="fas fa-video"></i> Your Videos</h3>
+                {% if videos %}
+                <div class="video-cards">
+                    {% for video in videos %}
+                    <div class="video-card">
+                        <div class="video-thumb">
+                            <a href="{{ video.result_link }}" target="_blank">
+                                <img src="/static/images/video-placeholder.webp" alt="{{ video.name }} thumbnail">
+                            </a>
+                        </div>
+                        <div class="video-info">
+                            <p class="video-meta">
+                                <span><i class="far fa-clock"></i> {{ video.duration_min }} minutes</span>
+                                <span><i class="fas fa-cog"></i> {{ video.resolution }}</span>
+                                <span><i class="fas fa-language"></i> {{ video.selected_language }}</span>
+                            </p>
+                            <p>
+                                Transcription:
+                                <strong>{{ "Yes" if video.is_transcription else "No" }}</strong>
+                            </p>
+                            <p>Date: {{ video.sent_time_utc.strftime('%Y-%m-%d') }}</p>
+                            <p class="video-link">
+                                <a href="{{ video.result_link }}" target="_blank">
+                                    <i class="fas fa-play-circle"></i> Result
+                                </a>
+                                <small>
+                                    <a href="{{ video.original_video_link }}" target="_blank"
+                                        class="original-video-link">
+                                        Original
+                                    </a>
+                                </small>
+                            </p>
+
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="no-videos">No videos available.</p>
+                {% endif %}
+            </div>
         </div>
     </div>
 </main>

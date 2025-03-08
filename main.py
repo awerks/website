@@ -1,26 +1,47 @@
 import os
 
-from fastapi import FastAPI, Request, Depends, HTTPException
+from fastapi import FastAPI, Request, Depends, HTTPException, Response
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from sqlalchemy import func, select, text
 from starlette.middleware.sessions import SessionMiddleware
 from auth import verify_telegram_auth, require_token_dependency, require_auth_dependency
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+from database import User, Video
 import google.auth.transport.requests
 import google.oauth2.id_token
+import logging
+
 
 FASTAPI_SECRET_KEY = os.getenv("FASTAPI_SECRET_KEY", "dev")
 FASTAPI_API_TOKEN = os.getenv("FASTAPI_API_TOKEN", "dev")
+APP_MODE = os.getenv("APP_MODE", "dev")
 MOUNT_DIRECTORY = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-APP_MODE = os.getenv("APP_MODE", "dev")
+
+from os import getenv
+
+DATABASE_URL = getenv("DATABASE_URL") if APP_MODE == "production" else getenv("DATABASE_PUBLIC_URL")
+# DATABASE_URL = DATABASE_URL.replace("+asyncpg", "")
+print("DATABASE_URL:", DATABASE_URL)
+
+
+engine = create_async_engine(DATABASE_URL, echo=False)
+AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        yield session
+
 
 docs_url = None if APP_MODE == "production" else "/docs"
 redoc_url = None if APP_MODE == "production" else "/redoc"
 openapi_url = None if APP_MODE == "production" else "/openapi.json"
 
-app = FastAPI(docs_url=docs_url, redoc_url=redoc_url, openapi_url=openapi_url)
-
+app = FastAPI(docs_url=docs_url, redoc_url=redoc_url, openapi_url=openapi_url, debug=APP_MODE == "dev")
 
 app.add_middleware(SessionMiddleware, secret_key=FASTAPI_SECRET_KEY)
 
@@ -94,22 +115,36 @@ async def login(request: Request):
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(
     request: Request,
+    auth: str = Depends(require_auth_dependency),
+    db: AsyncSession = Depends(get_db),
 ):
-    """Dashboard page that shows user details."""
+
     user_id = request.session.get("user_id")
     first_name = request.session.get("first_name")
     username = request.session.get("username")
     photo_url = request.session.get("photo_url")
+
     if app.debug:
-        user_id = "123456789"
+        print("HERE")
+        user_id = "631745148"
         first_name = "John"
         username = "john_doe"
+    import time
+
+    print("User ID:", user_id)
+    start_time = time.time()
+    query = await db.execute(select(Video).where(Video.user_id == user_id))
+    videos = query.scalars().all()
+    end_time = time.time()
+    print(f"Query executed in {end_time - start_time} seconds")
+
     context = {
         "request": request,
         "first_name": first_name,
         "id": user_id,
         "username": username,
         "photo_url": photo_url,
+        "videos": videos,
     }
     return templates.TemplateResponse("dashboard.html", context)
 
@@ -139,6 +174,7 @@ async def add_video_page(request: Request, token: str = Depends(require_token_de
         with open(output_path, "w") as f:
             f.write(html_content)
     except Exception as e:
+        print("Error writing file:", e)
         return JSONResponse({"status": 500, "error": str(e)}, status_code=500)
     return JSONResponse({"status": 200})
 
@@ -180,4 +216,4 @@ if __name__ == "__main__":
     import uvicorn
 
     # dual stack
-    uvicorn.run(app, host=["::", "0.0.0.0"], port=int(os.getenv("PORT")), log_level="error")
+    uvicorn.run(app, host=["::", "0.0.0.0"], port=int(os.getenv("PORT")), log_level="error", workers=32)
