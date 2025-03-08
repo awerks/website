@@ -62,7 +62,7 @@ async def telegram_login(request: Request):
     if verify_telegram_auth(verification_data, BOT_TOKEN):
         request.session.update(
             {
-                "user_id": user.get("id"),
+                "user_id": str(user.get("id")),
                 "first_name": user.get("first_name"),
                 "username": user.get("username"),  # might be absent sometimes
                 "photo_url": user.get("photo_url"),
@@ -85,7 +85,7 @@ async def google_login(request: Request):
         user = google.oauth2.id_token.verify_oauth2_token(token, request_adapter)
         request.session.update(
             {
-                "user_id": user.get("sub"),
+                "user_id": str(user.get("sub")),
                 "first_name": user.get("given_name"),
                 "username": user.get("email"),
                 "photo_url": user.get("picture"),
