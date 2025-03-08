@@ -216,4 +216,4 @@ if __name__ == "__main__":
     import uvicorn
 
     # dual stack
-    uvicorn.run(app, host=["::", "0.0.0.0"], port=int(os.getenv("PORT")), log_level="error", workers=32)
+    uvicorn.run(app, host=["::", "0.0.0.0"], port=int(os.getenv("PORT")), log_level="error")
