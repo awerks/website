@@ -157,6 +157,7 @@ async def add_video_page(request: Request, token: str = Depends(require_token_de
     """
     try:
         data = await request.json()
+        print("Received data:", data)
         video_url = data.get("video_url")
         captions_url = data.get("captions_url")
         file_name = data.get("file_name")
@@ -164,6 +165,7 @@ async def add_video_page(request: Request, token: str = Depends(require_token_de
         language_label = data.get("language_label", "English")
         original_video_url = data.get("original_video_url")
         html_content = templates.get_template("video_template.html").render(
+            request=request,
             video_url=video_url,
             captions_url=captions_url,
             original_video_url=original_video_url,
