@@ -166,3 +166,10 @@ async def about(request: Request):
 async def privacy(request: Request):
     """Renders the privacy policy page."""
     return templates.TemplateResponse("privacy.html", {"request": request})
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    # dual stack
+    uvicorn.run(app, host=["::", "0.0.0.0"], port=int(os.getenv("PORT")), log_level="error")

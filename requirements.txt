@@ -1,2 +1,5 @@
+
+itsdangerous
+requests
 google-auth
 fastapi[standard]

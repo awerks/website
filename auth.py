@@ -2,6 +2,7 @@ import hashlib
 import hmac
 from os import getenv
 from fastapi import HTTPException, Request
+from fastapi.responses import RedirectResponse
 
 FASTAPI_API_TOKEN = getenv("FASTAPI_API_TOKEN", "dev)")
 
@@ -27,6 +28,5 @@ def require_token_dependency(request: Request):
 def require_auth_dependency(request: Request):
     """Dependency to ensure the user is authenticated (via session)."""
     if "user_id" not in request.session:
-
-        raise HTTPException(status_code=401, detail="Not logged in")
+        return RedirectResponse(url=request.app.url_path_for("login"), status_code=302)
     return request.session
