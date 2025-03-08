@@ -9,6 +9,7 @@
 .video-page-container h2 {
     font-size: 2rem;
     margin-bottom: 0.5rem;
+    color: var(--header)
 }
 
 .video-page-container p {
@@ -30,10 +31,12 @@
     border-radius: 4px;
     transition: background 0.3s ease;
     font-weight: 600;
+    box-shadow: 0 4px 10px var(--primary);
 }
 
 .video-page-container .button.support-button {
     background-color: var(--accent);
+    /* box-shadow: 0 4px 10px var(--accent); */
 }
 
 .video-page-container .button:hover {
@@ -41,7 +44,7 @@
 }
 
 .video-page-container .button.support-button:hover {
-    background-color: var(--primary);
+    background-color: var(--secondary);
 }
 
 .video-wrapper {

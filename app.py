@@ -82,6 +82,10 @@ def dashboard():
     first_name = session.get("first_name")
     username = session.get("username")
     photo_url = session.get("photo_url")
+    #    # fake data for testing
+    #     user_id = "123456789"
+    #     first_name = "John"
+    #     username = "john_doe"
     return render_template("dashboard.html", first_name=first_name, id=user_id, username=username, photo_url=photo_url)
 
 

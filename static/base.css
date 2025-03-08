@@ -1,18 +1,20 @@
 :root[data-theme="light"] {
-    --text: #101413;
-    --background: #f3f7f6;
-    --primary: #336151;
-    --secondary: #85ccb3;
-    --accent: #34a27b;
+    --text: #09050a;
+    --background: #f7f3f8;
+    --primary: #985bb9;
+    --secondary: #c7a4db;
+    --accent: #ab72ca;
+    --header: #985bb9;
     --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 :root[data-theme="dark"] {
-    --text: #ebefee;
-    --background: #1b2724;
-    --primary: #9eccbc;
-    --secondary: #337a61;
-    --accent: #5dcba4;
+    --text: #f9f5fa;
+    --background: #24102a;
+    --primary: #8346a4;
+    --secondary: #47245b;
+    --accent: #6e358d;
+    --header: #c7a4db;
     --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
     /* Deeper shadow */
 }
@@ -87,7 +89,7 @@ main section {
 }
 
 main section h2 {
-    color: var(--primary);
+    color: var(--header);
     margin-bottom: 20px;
     font-size: 2rem;
     border-bottom: 2px solid #ddd;
@@ -194,7 +196,7 @@ nav a:hover {
 
 :root[data-theme="dark"] .button {
     box-shadow: none;
-    background-color: var(--secondary);
+    /* background-color: var(--primary); */
 }
 
 :root[data-theme="dark"] .button:hover {
