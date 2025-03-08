@@ -8,6 +8,7 @@
 {% block content %}
 <main class="dashboard">
     <div class="dashboard-container">
+        <!-- Profile Card -->
         <div class="profile-card">
             {% if photo_url %}
             <img src="{{ photo_url }}" alt="{{ first_name }}'s profile photo" class="profile-photo">
@@ -22,9 +23,20 @@
             <p>ID: {{ id }}</p>
         </div>
 
+        <!-- Dashboard Content -->
         <div class="dashboard-content">
             <p>Welcome to your dashboard! Here you can view your stats, manage your settings, and more.</p>
 
+            <!-- Sorting Controls -->
+            <div class="sorting-controls">
+                <span>Sort by:</span>
+                <a href="{{ request.url.include_query_params(sort_by='date') }}"
+                    class="{% if sort_by == 'date' %}active{% endif %}">Date</a>
+                <a href="{{ request.url.include_query_params(sort_by='duration') }}"
+                    class="{% if sort_by == 'duration' %}active{% endif %}">Duration</a>
+            </div>
+
+            <!-- Videos List -->
             <div class="videos-list">
                 <h3><i class="fas fa-video"></i> Your Videos</h3>
                 {% if videos %}
@@ -32,7 +44,6 @@
                     {% for video in videos %}
                     <div class="video-card">
                         <div class="video-thumb">
-
                             <a href="{{ video.result_link }}" target="_blank">
                                 {% if video.thumbnail_url %}
                                 <img src="{{ video.thumbnail_url }}" alt="{{ video.name }} thumbnail">
@@ -42,28 +53,24 @@
                             </a>
                         </div>
                         <div class="video-info">
+                            <h4>{{ video.name }}</h4>
                             <p class="video-meta">
                                 <span><i class="far fa-clock"></i> {{ video.duration_min }} minutes</span>
                                 <span><i class="fas fa-cog"></i> {{ video.resolution }}</span>
                                 <span><i class="fas fa-language"></i> {{ video.selected_language }}</span>
                             </p>
                             <p>
-                                Transcription:
-                                <strong>{{ "Yes" if video.is_transcription else "No" }}</strong>
+                                Transcription: <strong>{{ "Yes" if video.is_transcription else "No" }}</strong>
                             </p>
                             <p>Date: {{ video.sent_time_utc.strftime('%Y-%m-%d') }}</p>
                             <p class="video-link">
-                                <a href="{{ video.result_link }}" target="_blank">
-                                    <i class="fas fa-play-circle"></i> Result
-                                </a>
+                                <a href="{{ video.result_link }}" target="_blank"><i class="fas fa-play-circle"></i>
+                                    Result</a>
                                 <small>
                                     <a href="{{ video.original_video_link }}" target="_blank"
-                                        class="original-video-link">
-                                        Original
-                                    </a>
+                                        class="original-video-link">Original</a>
                                 </small>
                             </p>
-
                         </div>
                     </div>
                     {% endfor %}

@@ -115,10 +115,9 @@ async def login(request: Request):
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(
     request: Request,
-    auth: str = Depends(require_auth_dependency),
+    sort_by: str = "date",
     db: AsyncSession = Depends(get_db),
 ):
-
     user_id = request.session.get("user_id")
     first_name = request.session.get("first_name")
     username = request.session.get("username")
@@ -129,30 +128,27 @@ async def dashboard(
         user_id = "631745148"
         first_name = "John"
         username = "john_doe"
+
+    if sort_by == "duration":
+        order_clause = Video.duration_min.desc()
+    else:
+        order_clause = Video.sent_time_utc.desc()
     import time
 
-    print("User ID:", user_id)
     start_time = time.time()
-    query = await db.execute(select(Video).where(Video.user_id == user_id).order_by(Video.sent_time_utc.desc()))
+    query = await db.execute(select(Video).where(Video.user_id == str(user_id)).order_by(order_clause))
     videos = query.scalars().all()
     end_time = time.time()
     print(f"Query executed in {end_time - start_time} seconds")
-    # for video in videos:
-    #     if video.original_video_link and (
-    #         "youtube" in video.original_video_link or "youtu.be" in video.original_video_link
-    #     ):
-    #         video_id = video.original_video_link.split("v=")[-1].split("&")[0]
-    #         print("Video ID:", video_id)
-    #         video.thumbnail_url = f"https://img.youtube.com/vi/{video_id}/0.jpg"
 
     context = {
-        # request for base template always
         "request": request,
         "first_name": first_name,
         "id": user_id,
         "username": username,
         "photo_url": photo_url,
         "videos": videos,
+        "sort_by": sort_by,
     }
     return templates.TemplateResponse("dashboard.html", context)
 

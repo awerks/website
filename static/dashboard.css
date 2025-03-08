@@ -168,3 +168,38 @@ main.dashboard {
         grid-template-columns: 1fr;
     }
 }
+
+.sorting-controls {
+    margin-bottom: 1.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--secondary);
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.sorting-controls span {
+    font-size: 1rem;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.sorting-controls a {
+    font-size: 1rem;
+    color: var(--text);
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.sorting-controls a:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
+.sorting-controls a.active {
+    background: var(--primary);
+    color: #fff;
+}
