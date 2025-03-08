@@ -1,7 +1,7 @@
 import os
 
 from fastapi import FastAPI, Request, Depends, HTTPException
-from fastapi.responses import JSONResponse, RedirectResponse, FileResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
@@ -23,7 +23,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 
-@app.post("/telegram-login")
+@app.post("/telegram-login", response_class=JSONResponse | RedirectResponse)
 async def telegram_login(request: Request):
     """Endpoint for Telegram login."""
     try:
@@ -46,7 +46,7 @@ async def telegram_login(request: Request):
         return JSONResponse({"error": "Invalid Telegram data"}, status_code=403)
 
 
-@app.post("/google_login")
+@app.post("/google_login", response_class=JSONResponse | RedirectResponse)
 async def google_login(request: Request):
     """Endpoint for Google login. Expects form data with a 'credential' field."""
     form_data = await request.form()
@@ -70,14 +70,14 @@ async def google_login(request: Request):
     return RedirectResponse(url=app.url_path_for("dashboard"), status_code=302)
 
 
-@app.get("/logout")
+@app.get("/logout", response_class=RedirectResponse)
 async def logout(request: Request):
     """Clears the session and redirects to the login page."""
     request.session.clear()
     return RedirectResponse(url=app.url_path_for("login"), status_code=302)
 
 
-@app.get("/login")
+@app.get("/login", response_class=HTMLResponse)
 async def login(request: Request):
     """Renders the login page if the user is not authenticated."""
     if "user_id" in request.session:
@@ -85,7 +85,7 @@ async def login(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
 
-@app.get("/dashboard")
+@app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request, token: str = Depends(require_auth_dependency)):
     """Dashboard page that shows user details."""
     user_id = request.session.get("user_id")
@@ -106,7 +106,7 @@ async def dashboard(request: Request, token: str = Depends(require_auth_dependen
     return templates.TemplateResponse("dashboard.html", context)
 
 
-@app.post("/add_video_page")
+@app.post("/add_video_page", response_class=JSONResponse)
 async def add_video_page(request: Request, token: str = Depends(require_token_dependency)):
     """
     Renders a video page template with provided parameters and writes it to disk.
@@ -135,7 +135,7 @@ async def add_video_page(request: Request, token: str = Depends(require_token_de
     return JSONResponse({"status": 200})
 
 
-@app.get("/result/{name:path}")
+@app.get("/result/{name:path}", response_class=FileResponse)
 async def serve_rendered_page(name: str):
     """Serves a rendered HTML page from the mounted directory."""
     file_path = os.path.join(MOUNT_DIRECTORY, f"{name}.html")
@@ -144,25 +144,25 @@ async def serve_rendered_page(name: str):
     return FileResponse(file_path)
 
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def serve_index(request: Request):
     """Renders the index page."""
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.get("/video")
+@app.get("/video", response_class=HTMLResponse)
 async def video(request: Request):
     """Renders the video template page."""
     return templates.TemplateResponse("video_template.html", {"request": request})
 
 
-@app.get("/about")
+@app.get("/about", response_class=HTMLResponse)
 async def about(request: Request):
     """Renders the about page."""
     return templates.TemplateResponse("about.html", {"request": request})
 
 
-@app.get("/privacy")
+@app.get("/privacy", response_class=HTMLResponse)
 async def privacy(request: Request):
     """Renders the privacy policy page."""
     return templates.TemplateResponse("privacy.html", {"request": request})

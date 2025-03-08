@@ -9,7 +9,6 @@ FASTAPI_API_TOKEN = getenv("FASTAPI_API_TOKEN", "dev)")
 
 def verify_telegram_auth(data: dict, bot_token: str) -> bool:
     """Verifies the integrity of Telegram login data."""
-    # Remove and capture the provided hash
     received_hash = data.pop("hash")
     data_check_string = "\n".join(f"{k}={data[k]}" for k in sorted(data.keys()))
     secret_key = hashlib.sha256(bot_token.encode()).digest()
