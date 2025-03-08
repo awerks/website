@@ -46,7 +46,8 @@
                         <div class="video-thumb">
                             <a href="{{ video.result_link }}" target="_blank">
                                 {% if video.thumbnail_url %}
-                                <img src="{{ video.thumbnail_url }}" alt="{{ video.name }} thumbnail">
+                                <img src="{{ video.thumbnail_url }}" alt="{{ video.name }} thumbnail"
+                                    onerror="this.onerror=null;this.src='/static/images/video-placeholder.webp';">
                                 {% else %}
                                 <img src="/static/images/video-placeholder.webp" alt="{{ video.name }} thumbnail">
                                 {% endif %}
