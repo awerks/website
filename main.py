@@ -13,8 +13,14 @@ FASTAPI_SECRET_KEY = os.getenv("FASTAPI_SECRET_KEY", "dev")
 FASTAPI_API_TOKEN = os.getenv("FASTAPI_API_TOKEN", "dev")
 MOUNT_DIRECTORY = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+APP_MODE = os.getenv("APP_MODE", "dev")
 
-app = FastAPI()
+docs_url = None if APP_MODE == "production" else "/docs"
+redoc_url = None if APP_MODE == "production" else "/redoc"
+openapi_url = None if APP_MODE == "production" else "/openapi.json"
+
+app = FastAPI(docs_url=docs_url, redoc_url=redoc_url, openapi_url=openapi_url)
+
 
 app.add_middleware(SessionMiddleware, secret_key=FASTAPI_SECRET_KEY)
 
@@ -23,7 +29,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 
-@app.post("/telegram-login", response_class=JSONResponse | RedirectResponse)
+@app.post("/telegram-login")
 async def telegram_login(request: Request):
     """Endpoint for Telegram login."""
     try:
@@ -46,7 +52,7 @@ async def telegram_login(request: Request):
         return JSONResponse({"error": "Invalid Telegram data"}, status_code=403)
 
 
-@app.post("/google_login", response_class=JSONResponse | RedirectResponse)
+@app.post("/google_login")
 async def google_login(request: Request):
     """Endpoint for Google login. Expects form data with a 'credential' field."""
     form_data = await request.form()
@@ -86,7 +92,9 @@ async def login(request: Request):
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
-async def dashboard(request: Request, token: str = Depends(require_auth_dependency)):
+async def dashboard(
+    request: Request,
+):
     """Dashboard page that shows user details."""
     user_id = request.session.get("user_id")
     first_name = request.session.get("first_name")

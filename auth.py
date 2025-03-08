@@ -27,5 +27,7 @@ def require_token_dependency(request: Request):
 def require_auth_dependency(request: Request):
     """Dependency to ensure the user is authenticated (via session)."""
     if "user_id" not in request.session:
-        return RedirectResponse(url=request.app.url_path_for("login"), status_code=302)
+        raise HTTPException(
+            status_code=302, detail="Not authenticated", headers={"Location": request.app.url_path_for("login")}
+        )
     return request.session
