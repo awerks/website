@@ -26,17 +26,17 @@ allowed_origins = (
 )
 
 app = FastAPI(docs_url=docs_url, redoc_url=redoc_url, openapi_url=openapi_url, debug=not production_mode)
-app.add_middleware(ProxyHeadersMiddleware)
 app.state.limiter = limiter
 
+app.add_middleware(ProxyHeadersMiddleware)
 app.add_middleware(SessionMiddleware, secret_key=FASTAPI_SECRET_KEY)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=allowed_origins,
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(auth_router)
 
@@ -170,4 +170,9 @@ if __name__ == "__main__":
 
     # dual stack
     print("Starting server")
-    uvicorn.run(app, host=["::", "0.0.0.0"], port=int(os.getenv("PORT")), log_level="error")
+    uvicorn.run(
+        app,
+        host=["::", "0.0.0.0"],
+        port=int(os.getenv("PORT")),
+        # log_level="error"
+    )
