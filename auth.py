@@ -81,15 +81,23 @@ async def google_login(request: Request, db: AsyncSession = Depends(get_db)):
     name = user.get("given_name")
     photo_url = user.get("picture")
 
-    existing_user = await db.execute(select(User).where(User.user_id == user_id))
-
-    if not existing_user.scalar_one_or_none():
+    # first email, if the user already registered with the same email
+    existing_user = await db.execute(
+        select(User.user_id).where(
+            or_(
+                User.email == email,
+                User.user_id == user_id,
+            )
+        )
+    )
+    existing_user_id = existing_user.scalar_one_or_none()
+    if not existing_user_id:
         db.add(User(user_id=user_id, username=username, name=name, email=email))
         await db.commit()
 
     request.session.update(
         {
-            "user_id": user_id,
+            "user_id": existing_user_id or user_id,
             "first_name": name,
             "username": username,
             "photo_url": photo_url,
