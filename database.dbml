@@ -1,17 +1,19 @@
 Table "users" {
-  "user_id" text [pk, not null]
+  "user_id" text [pk, not null, default: `(uuid_generate_v4())::text`]
   "username" text
   "name" text
   "start_time_utc" timestamp
-  "bot_language" text
-  "user_font_size" text
-  "user_font" text
-  "user_border_style" text
-  "default_language" text
-  "default_resolution" text
-  "transcribe" text
-  "subtitle_choice" text
-  "available_minutes" int4
+  "bot_language" text [default: 'en']
+  "user_font_size" text [default: 'default']
+  "user_font" text [default: 'default']
+  "user_border_style" text [default: 'default']
+  "default_language" text [default: 'default']
+  "default_resolution" text [default: 'default']
+  "transcribe" text [default: 'default']
+  "subtitle_choice" text [default: 'default']
+  "available_minutes" int4 [default: 90]
+  "email" text
+  "password" text
 }
 
 Table "videos" {

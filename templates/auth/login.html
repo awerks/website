@@ -1,8 +1,8 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block title %}Login{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="/static/login.css">
+<link rel="stylesheet" href="/static/auth.css">
 <script>
     (function () {
         var buttonType = window.innerWidth < 600 ? 'icon' : 'standard';
@@ -12,35 +12,49 @@
     })();
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+    body {
+        padding: 0;
+    }
+</style>
 {% endblock %}
 
 
 {% block content %}
-<main class="section">
-    <h1 style="text-align: center;">Login</h1>
-    <form action="{{ url_for('login') }}" method="post">
-        <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-        </div>
-        <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <button type="submit" class="button">Login</button>
+<main>
+    <section class="login-container">
+        <h1>Login</h1>
+        <form action="{{ url_for('login') }}" method="post">
+            <div class="form-group">
+                <label for="username_or_email">Email or username:</label>
+                <input type="text" id="username_or_email" name="username_or_email" required
+                    placeholder="Enter your username" value="{{ username_or_email | default('') }}">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+            </div>
+            {% if error %}
+            <p style="color: red; margin-bottom: 1rem;">{{ error }}</p>
+            {% elif message %}
+            <p style="color: green; margin-bottom: 1rem;">{{ message }}</p>
+            {% endif %}
+            <button type="submit" class="button">Login</button>
+        </form>
+        <div class="social-login-buttons">
+            <div class="social-button" id="telegram-login-button">
+                <script async src="https://telegram.org/js/telegram-widget.js?7"
+                    data-telegram-login="SubtitlesGeneratorBot" data-size="large" data-userpic="false"
+                    data-request-access="write" data-onauth="onTelegramAuth(user)">
+                    </script>
+            </div>
 
-    </form>
-    <div class="social-login-buttons">
-        <div class="social-button" id="telegram-login-button">
-            <script async src="https://telegram.org/js/telegram-widget.js?7" data-telegram-login="SubtitlesGeneratorBot"
-                data-size="large" data-userpic="false" data-request-access="write" data-onauth="onTelegramAuth(user)">
-                </script>
+            <div class="social-button" id="google-login-button">
+                <div id="google-signin-container"></div>
+            </div>
         </div>
+    </section>
 
-        <div class="social-button" id="google-login-button">
-            <div id="google-signin-container"></div>
-        </div>
-    </div>
 
     <script>
         function onTelegramAuth(user) {
@@ -70,7 +84,7 @@
             var googleButtonHTML =
                 '<div id="g_id_onload" ' +
                 'data-client_id="612951769125-keb4f56moc9g8il5vs8ks040hcdkmnfq.apps.googleusercontent.com" ' +
-                'data-login_uri="https://captionyx.com/google_login" ' +
+                'data-login_uri="/auth/google_login" ' +
                 'data-auto_prompt="false">' +
                 '</div>' +
                 '<div class="g_id_signin" ' +

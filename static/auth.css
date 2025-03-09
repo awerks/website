@@ -1,11 +1,23 @@
 form {
     background: var(--background, #fff);
-    max-width: 400px;
     margin: 2rem auto;
-    padding: 2rem;
+    /* padding: 2rem; */
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
 }
+
+h1 {
+    text-align: center;
+}
+
+main section {
+    min-width: 25vw;
+    box-shadow: var(--card-shadow);
+    /* padding: 2rem; */
+    border-radius: 8px;
+}
+
+
 
 .form-group {
     margin-bottom: 1.5rem;
@@ -25,6 +37,8 @@ form {
     border: 1px solid #ccc;
     border-radius: 4px;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background: var(--background);
+    color: var(--text);
 }
 
 .form-group input:focus {
@@ -54,4 +68,43 @@ button[type="submit"]:hover {
     justify-content: center;
     gap: 1.5rem;
     margin-top: 2rem;
+}
+
+.google-signup-container {
+    background: var(--secondary, #c7a4db);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: var(--card-shadow, 0 4px 20px rgba(0, 0, 0, 0.1));
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.google-signup-container h1 {
+    font-size: 2rem;
+    color: var(--header);
+}
+
+.normal-register-container {
+    flex: 1 1 400px;
+    background: var(--background, #ffffff);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: var(--card-shadow, 0 4px 20px rgba(0, 0, 0, 0.1));
+}
+
+.google-singup-button {
+    display: inline-block;
+}
+
+
+.login-container {
+    padding: 2rem;
+}
+
+@media (max-width: 768px) {
+    .login-container {
+        padding: 1rem;
+    }
+
 }

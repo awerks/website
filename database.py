@@ -1,4 +1,3 @@
-# Define the base for declarative models
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy import (
     Column,
@@ -7,27 +6,39 @@ from sqlalchemy import (
     Text,
     TIMESTAMP,
     Boolean,
+    text,
     ForeignKey,
 )
+from os import getenv
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
+
+APP_MODE = getenv("APP_MODE", "dev")
+DATABASE_URL = getenv("DATABASE_URL") if APP_MODE == "production" else getenv("DATABASE_PUBLIC_URL")
+
+engine = create_async_engine(DATABASE_URL, echo=False)
+AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
 class User(Base):
     __tablename__ = "users"
-    user_id = Column(String, primary_key=True, nullable=False)
+    user_id = Column(String, primary_key=True, nullable=False, server_default=text("(uuid_generate_v4())::text"))
     username = Column(String)
     name = Column(String)
-    start_time_utc = Column(TIMESTAMP)
-    bot_language = Column(String)
-    user_font_size = Column(String)
-    user_font = Column(String)
-    user_border_style = Column(String)
-    default_language = Column(String)
-    default_resolution = Column(String)
-    transcribe = Column(String)
-    subtitle_choice = Column(String)
-    available_minutes = Column(Integer)
+    email = Column(String)
+    password = Column(String)
+    start_time_utc = Column(TIMESTAMP(timezone=True))
+    bot_language = Column(String, server_default=text("'en'"))
+    user_font_size = Column(String, server_default=text("'default'"))
+    user_font = Column(String, server_default=text("'default'"))
+    user_border_style = Column(String, server_default=text("'default'"))
+    default_language = Column(String, server_default=text("'default'"))
+    default_resolution = Column(String, server_default=text("'default'"))
+    transcribe = Column(String, server_default=text("'default'"))
+    subtitle_choice = Column(String, server_default=text("'default'"))
+    available_minutes = Column(Integer, server_default=text("90"))
 
     videos = relationship("Video", back_populates="user", cascade="all, delete-orphan")
 
@@ -40,10 +51,15 @@ class Video(Base):
     name = Column(String)
     result_link = Column(Text, nullable=False)
     original_video_link = Column(Text)
-    sent_time_utc = Column(TIMESTAMP, nullable=False)
+    sent_time_utc = Column(TIMESTAMP(timezone=True), nullable=False)
     duration_min = Column(Integer)
     resolution = Column(String)
     selected_language = Column(String)
     is_transcription = Column(Boolean)
     thumbnail_url = Column(Text)
     user = relationship("User", back_populates="videos")
+
+
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        yield session

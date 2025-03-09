@@ -6,3 +6,5 @@ fastapi[standard]
 asyncpg
 sqlalchemy
 greenlet
+Werkzeug
+slowapi

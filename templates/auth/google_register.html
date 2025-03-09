@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Complete Registration{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="/static/auth.css">
+{% endblock %}
+
+{% block content %}
+<style>
+    main section {
+        padding: 2rem;
+    }
+</style>
+<main>
+    <section>
+        <h1>Complete Registration</h1>
+        <form method="POST" action="{{ url_for('finalize_google_register') }}" onsubmit="return validateForms()">
+            <div class="form-group">
+                <label for="name">Name <span style="color: red;">*</span></label>
+                <input type="text" id="name" name="name" value="{{ request.session.name | default('') }}" required
+                    placeholder="Enter your name" minlength="2" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label for="username">Username <span style="color: red;">*</span></label>
+                <input type="text" id="username" name="username" value="{{ request.session.username  | default('') }}"
+                    required placeholder="Enter a username" minlength="5" maxlength="20">
+                <small id="username-error" style="margin: 5px 0; display: none; text-align: left;">Username is
+                    already
+                    taken</small>
+            </div>
+            <div class="form-group">
+                <label for="password">Password <span style="color: red;">*</span></label>
+                <input type="password" id="password" name="password" required placeholder="Enter a password"
+                    minlength="8" maxlength="30">
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password <span style="color: red;">*</span></label>
+                <input type="password" id="confirm_password" name="confirm_password" required minlength="8"
+                    maxlength="30" placeholder="Confirm your password">
+                <small id="password-error" style="color: red; margin-top: 0.5rem; display: none;">Passwords do not
+                    match</small>
+            </div>
+            {% if error %}
+            <p style="color: red;">{{ error }}</p>
+            <p>Already have an account? <a href="{{ url_for('login') }}" style="text-decoration: underline;">Login
+                    here.</a></p>
+            {% endif %}
+            <button type="submit" class="button">Register</button>
+        </form>
+    </section>
+</main>
+<script>
+    function validateForms() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+        const errorMessage = document.getElementById('password-error');
+        if (password !== confirmPassword) {
+            errorMessage.style.display = 'block';
+            return false;
+        } else {
+            errorMessage.style.display = 'none';
+        }
+        return true;
+    }
+    document.getElementById('confirm_password').addEventListener('input', function () {
+        const password = document.getElementById('password').value;
+        const confirmPassword = this.value;
+        const errorMessage = document.getElementById('password-error');
+
+        if (password !== confirmPassword) {
+            errorMessage.style.display = 'block';
+        } else {
+            errorMessage.style.display = 'none';
+        }
+    });
+    document.getElementById('username').addEventListener('blur', function () {
+
+        const username = this.value;
+        if (!username) {
+            return;
+        }
+        const errorMessage = document.getElementById('username-error');
+
+        fetch("{{ url_for('check_username') }}?username=" + encodeURIComponent(username), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    errorMessage.style.display = 'block';
+                } else {
+                    errorMessage.style.display = 'none';
+                }
+            });
+    });
+
+</script>
+{% endblock %}
