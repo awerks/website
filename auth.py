@@ -90,7 +90,7 @@ async def google_login(request: Request, db: AsyncSession = Depends(get_db)):
             )
         )
     )
-    existing_user_id = existing_user.scalar_one_or_none()
+    existing_user_id = existing_user.first()
     if not existing_user_id:
         db.add(User(user_id=user_id, username=username, name=name, email=email))
         await db.commit()
