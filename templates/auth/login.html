@@ -59,7 +59,7 @@
     <script>
         function onTelegramAuth(user) {
             console.log("Telegram user:", user);
-            fetch('/telegram-login', {
+            fetch('/auth/telegram-login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(user)
