@@ -12,8 +12,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from database import User, Video, get_db
 from slowapi.errors import RateLimitExceeded
-from rate_limiter import limiter
+from rate_limiter import get_real_ip, limiter
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 FASTAPI_SECRET_KEY = os.getenv("FASTAPI_SECRET_KEY", "dev")
 FASTAPI_API_TOKEN = os.getenv("FASTAPI_API_TOKEN", "dev")
@@ -30,13 +31,13 @@ app.state.limiter = limiter
 
 app.add_middleware(ProxyHeadersMiddleware)
 app.add_middleware(SessionMiddleware, secret_key=FASTAPI_SECRET_KEY)
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=allowed_origins,
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(auth_router)
 
@@ -48,6 +49,19 @@ async def custom_http_exception_handler(request: Request, exc: StarletteHTTPExce
     if exc.status_code == 404:
         return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
     raise exc
+
+
+class RequestIPMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        ip = get_real_ip(request)
+
+        print(f"[{ip}]: {request.method} {request.url}")
+        response = await call_next(request)
+        print(f"[{ip}]: {request.method} {request.url} - :{response.status_code}")
+        return response
+
+
+app.add_middleware(RequestIPMiddleware)
 
 
 @app.exception_handler(RateLimitExceeded)
@@ -170,9 +184,4 @@ if __name__ == "__main__":
 
     # dual stack
     print("Starting server")
-    uvicorn.run(
-        app,
-        host=["::", "0.0.0.0"],
-        port=int(os.getenv("PORT")),
-        # log_level="error"
-    )
+    uvicorn.run(app, host=["::", "0.0.0.0"], port=int(os.getenv("PORT")), log_level="error")
