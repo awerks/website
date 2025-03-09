@@ -13,6 +13,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from database import User, Video, get_db
 from slowapi.errors import RateLimitExceeded
 from rate_limiter import limiter
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 FASTAPI_SECRET_KEY = os.getenv("FASTAPI_SECRET_KEY", "dev")
 FASTAPI_API_TOKEN = os.getenv("FASTAPI_API_TOKEN", "dev")
@@ -25,7 +26,7 @@ allowed_origins = (
 )
 
 app = FastAPI(docs_url=docs_url, redoc_url=redoc_url, openapi_url=openapi_url, debug=not production_mode)
-
+app.add_middleware(ProxyHeadersMiddleware)
 app.state.limiter = limiter
 
 app.add_middleware(SessionMiddleware, secret_key=FASTAPI_SECRET_KEY)

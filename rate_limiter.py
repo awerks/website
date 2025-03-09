@@ -13,14 +13,11 @@ def get_real_ip(request: Request):
 
     """
     cf_ip = request.headers.get("CF-Connecting-IP")
-    print("CF-Connecting-IP:", cf_ip)
     if cf_ip:
         return cf_ip
     x_forwarded_for = request.headers.get("X-Forwarded-For")
-    print("X-Forwarded-For:", x_forwarded_for)
     if x_forwarded_for:
         return x_forwarded_for.split(",")[0].strip()
-    print("Client IP:", request.client.host)
     return request.client.host
 
 
