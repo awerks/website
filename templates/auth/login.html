@@ -11,7 +11,7 @@
         };
     })();
 </script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
 <style>
     body {
         padding: 0;
@@ -58,7 +58,6 @@
 
     <script>
         function onTelegramAuth(user) {
-            console.log("Telegram user:", user);
             fetch('/auth/telegram-login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

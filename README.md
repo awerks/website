@@ -1,10 +1,10 @@
-# FastAPI Application
+# Captionyx
 
-A web application built with FastAPI, a lightweight ASGI web application framework in Python.
+Website built with FastAPI, a lightweight ASGI web application framework in Python.
 
 ## Description
 
-This is a FastAPI-based web application that [briefly describe what the application does]. It provides [key features/functionality].
+This is a FastAPI-based web application that provides a simple way to generate subtitles for videos. It uses the OpenAI Whisper model for automatic speech recognition (ASR) and provides a user-friendly interface for uploading videos and downloading subtitles.
 
 ## Installation
 
@@ -16,31 +16,34 @@ This is a FastAPI-based web application that [briefly describe what the applicat
 ### Setup
 
 1. Clone the repository:
-  ```bash
-  git clone https://github.com/yourusername/flask_app.git
-  cd flask_app
-  ```
+
+```bash
+git clone https://github.com/yourusername/flask_app.git
+cd flask_app
+```
 
 2. Create a virtual environment (recommended):
-  ```bash
-  python -m venv venv
-  source venv/bin/activate  # On Windows: venv\Scripts\activate
-  ```
+
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
 3. Install dependencies:
-  ```bash
-  pip install -r requirements.txt
-  ```
 
+```bash
+pip install -r requirements.txt
+```
 
 ## Usage
 
 1. Start the application:
-  ```bash
-  fastapi dev
-  # or
-  python3 main.py
-  ```
+
+```bash
+fastapi dev
+# or
+python3 main.py
+```
 
 2. Access the application at `http://localhost:8000` in your web browser.
 
@@ -55,7 +58,6 @@ website/
 ├── routes/         # API routes and views
 └── utils/          # Utility functions
 ```
-
 
 ## Dependencies
 
@@ -73,7 +75,6 @@ Configuration settings are stored in `config.py` and environment variables:
 - `DATABASE_URL`: Database connection string
 
 ## Development
-
 
 ### Code Style
 
