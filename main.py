@@ -57,7 +57,7 @@ class RequestIPMiddleware(BaseHTTPMiddleware):
 
         print(f"[{ip}]: {request.method} {request.url}")
         response = await call_next(request)
-        print(f"[{ip}]: {request.method} {request.url} - :{response.status_code}")
+        print(f"[{ip}]: {request.method} {request.url} - [{response.status_code}]")
         return response
 
 
@@ -74,7 +74,7 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
 async def dashboard(
     request: Request,
     sort_by: str = "date",
-    auth: dict = Depends(require_auth_dependency),
+    # auth: dict = Depends(require_auth_dependency),
     db: AsyncSession = Depends(get_db),
 ):
     user_id = request.session.get("user_id")
@@ -104,7 +104,6 @@ async def dashboard(
         "videos": videos,
         "sort_by": sort_by,
     }
-    print("Serving dashboard page")
     print(f"User ID: {user_id}; First Name: {first_name}; Username: {username}; Photo URL: {photo_url}")
     return templates.TemplateResponse("dashboard.html", context)
 
@@ -147,35 +146,31 @@ async def serve_rendered_page(name: str):
     file_path = os.path.join(MOUNT_DIRECTORY, f"{name}.html")
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")
-    print("Serving rendered page:", file_path)
     return FileResponse(file_path)
 
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_index(request: Request):
     """Renders the index page."""
-    print("Serving index page")
     return templates.TemplateResponse("index.html", {"request": request})
 
 
 @app.get("/video", response_class=HTMLResponse)
 async def video(request: Request):
     """Renders the video template page."""
-    print("Serving video template")
     return templates.TemplateResponse("video_template.html", {"request": request})
 
 
-@app.get("/about", response_class=HTMLResponse)
+@app.get("/about")
 async def about(request: Request):
     """Renders the about page."""
-    print("Serving about page")
+    forwarded_proto = request.headers.get("X-Forwarded-Proto")
     return templates.TemplateResponse("about.html", {"request": request})
 
 
 @app.get("/privacy", response_class=HTMLResponse)
 async def privacy(request: Request):
     """Renders the privacy policy page."""
-    print("Serving privacy policy")
     return templates.TemplateResponse("privacy.html", {"request": request})
 
 
