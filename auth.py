@@ -17,6 +17,7 @@ from rate_limiter import limiter
 
 FASTAPI_API_TOKEN = getenv("FASTAPI_API_TOKEN", "dev)")
 BOT_TOKEN = getenv("BOT_TOKEN")
+GOOGLE_CLIENT_ID = getenv("GOOGLE_CLIENT_ID", "dev")
 router = APIRouter(prefix="/auth", tags=["auth"])
 auth_templates = Jinja2Templates(directory="templates/auth")
 auth_templates.env.loader = ChoiceLoader([FileSystemLoader("templates"), FileSystemLoader("templates/auth")])
@@ -71,8 +72,9 @@ async def google_login(request: Request, db: AsyncSession = Depends(get_db)):
         return JSONResponse({"error": "No token provided"}, status_code=400)
     try:
         request_adapter = google.auth.transport.requests.Request()
-        user = google.oauth2.id_token.verify_oauth2_token(token, request_adapter)
-    except Exception:
+        user = google.oauth2.id_token.verify_oauth2_token(token, request_adapter, GOOGLE_CLIENT_ID)
+    except Exception as e:
+        print("Error decoding token:", e)
         return JSONResponse({"error": "Error decoding token"}, status_code=400)
 
     user_id = str(user.get("sub"))
