@@ -27,6 +27,5 @@ async def send_email(to_address, subject, html_body):
         port=smtp_port,
         username=smtp_username,
         password=smtp_password,
-        use_tls=True,
         timeout=5,
     )
