@@ -41,6 +41,7 @@ class User(Base):
     available_minutes = Column(Integer, server_default=text("90"))
 
     videos = relationship("Video", back_populates="user", cascade="all, delete-orphan")
+    tokens = relationship("ResetConfirmToken", back_populates="user", cascade="all, delete-orphan")
 
 
 class Video(Base):
@@ -58,6 +59,14 @@ class Video(Base):
     is_transcription = Column(Boolean)
     thumbnail_url = Column(Text)
     user = relationship("User", back_populates="videos")
+
+
+class ResetConfirmToken(Base):
+    __tablename__ = "reset_confirm_tokens"
+    token = Column(String(36), primary_key=True, nullable=False)
+    user_id = Column(String, ForeignKey("users.user_id"))
+    expires_at = Column(TIMESTAMP(timezone=True), nullable=False)
+    user = relationship("User", back_populates="tokens")
 
 
 async def get_db():

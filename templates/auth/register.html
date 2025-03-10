@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Register{% endblock %}
+{% block title %}Sign up{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="/static/auth.css">
@@ -21,13 +21,13 @@
                         data-login_uri="/auth/google_register_callback" data-auto_prompt="false">
                     </div>
 
-                    <div class="g_id_signin" data-type="standard" data-size="large" data-theme="filled_black"
+                    <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
                         data-text="signup_with" data-shape="circle" data-logo_alignment="left">
                     </div>
                 </div>
             </div>
             <div class="normal-register-container">
-                <h1>Register with Email</h1>
+                <h1>Sign up with Email</h1>
 
                 <form method="POST" action="{{ url_for('register') }}" onsubmit="return validateForms()"
                     style="box-shadow: none; padding:0;">
@@ -71,7 +71,7 @@
                     <p style="color: red;">{{ error }}</p>
                     {% endif %}
 
-                    <button type="submit" class="button">Register</button>
+                    <button type="submit" class="button">Sign up</button>
 
 
                 </form>

@@ -65,9 +65,15 @@ button[type="submit"]:hover {
 
 .social-login-buttons {
     display: flex;
+    /* align-items: cen ter; */
     justify-content: center;
     gap: 1.5rem;
-    margin-top: 2rem;
+    /* margin-top: 1.5rem; */
+    /* padding: 1rem; */
+    background-color: var(--background);
+    /* border: 1px dotted var(--primary, #ccc); */
+    border-radius: 20px;
+    /* box-shadow: 0 3px 4px rgba(0, 0, 0, 0.05); */
 }
 
 .google-signup-container {
@@ -100,11 +106,69 @@ button[type="submit"]:hover {
 
 .login-container {
     padding: 2rem;
+    border-radius: 20px;
 }
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
     .login-container {
         padding: 1rem;
     }
 
+} */
+
+.input-container {
+    position: relative;
+}
+
+.input-container i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    font-size: 1.1rem;
+}
+
+.input-container input {
+    width: 100%;
+    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background: var(--background, #fff);
+    color: var(--text, #333);
+}
+
+.input-container input:focus {
+    border-color: var(--primary, #336151);
+    box-shadow: 0 0 5px rgba(51, 97, 81, 0.5);
+    outline: none;
+}
+
+
+.form-container {
+    background: var(--background);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+.form-container h1 {
+    margin-bottom: 1rem;
+    font-size: 2rem;
+    color: var(--header);
+    border-bottom: 2px solid #ddd;
+}
+
+.form-container label {
+    text-align: left;   
+}
+
+.form-container p {
+    margin-bottom: 1.5rem;
+    color: var(--text);
 }

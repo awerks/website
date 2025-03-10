@@ -1,6 +1,7 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import hashlib
 import hmac
+import uuid
 import google.oauth2.id_token
 import google.auth.transport.requests
 
@@ -11,16 +12,19 @@ from fastapi.templating import Jinja2Templates
 from jinja2 import ChoiceLoader, FileSystemLoader
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_db, User, Video
+from database import ResetConfirmToken, get_db, User, Video
 from werkzeug.security import generate_password_hash, check_password_hash
 from rate_limiter import limiter
+from utils import send_email
 
 FASTAPI_API_TOKEN = getenv("FASTAPI_API_TOKEN", "dev)")
 BOT_TOKEN = getenv("BOT_TOKEN")
 GOOGLE_CLIENT_ID = getenv("GOOGLE_CLIENT_ID", "dev")
 router = APIRouter(prefix="/auth", tags=["auth"])
 auth_templates = Jinja2Templates(directory="templates/auth")
-auth_templates.env.loader = ChoiceLoader([FileSystemLoader("templates"), FileSystemLoader("templates/auth")])
+auth_templates.env.loader = ChoiceLoader(
+    [FileSystemLoader("templates"), FileSystemLoader("templates/auth"), FileSystemLoader("templates/email")]
+)
 
 
 @router.post("/telegram-login")
@@ -295,6 +299,103 @@ async def check_email(request: Request, email: str, db: AsyncSession = Depends(g
         return JSONResponse({"exists": False})
     user = await db.execute(select(User).where(User.email == email))
     return JSONResponse({"exists": bool(user.first())})
+
+
+@router.get("/forgot_password", response_class=HTMLResponse)
+async def forgot_password(request: Request):
+    """Renders the forgot password page."""
+    return auth_templates.TemplateResponse("forgot_password.html", {"request": request})
+
+
+@router.post("/forgot_password", response_class=RedirectResponse)
+@limiter.limit("5/minute")
+async def forgot_password_user(request: Request, db: AsyncSession = Depends(get_db)):
+    """Handles password reset request. Expects form data with email."""
+    form_data = await request.form()
+    email = form_data.get("email").lower()
+    user = await db.execute(select(User).where(User.email == email))
+    user = user.scalar()
+    if not user:
+        return auth_templates.TemplateResponse(
+            "forgot_password.html",
+            {"request": request, "error": "Email not found", "email": email},
+        )
+
+    print(f"Password reset requested for {user.username} ({user.email})")
+    token = str(uuid.uuid4())
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+    db.add(ResetConfirmToken(token=token, user_id=user.user_id, expires_at=expires_at))
+    await db.commit()
+    reset_link = request.url_for("reset_password", token=token)
+    subject = "Password Reset Request"
+    html_body = auth_templates.get_template("reset_password_email.html").render(
+        request=request, reset_password_link=reset_link
+    )
+    await send_email(to_address=email, subject=subject, html_body=html_body)
+    print("Sending password reset email to:", email)
+    return auth_templates.TemplateResponse(
+        "forgot_password.html",
+        {
+            "request": request,
+            "message": "Password reset email sent",
+            "email": email,
+        },
+    )
+
+
+@router.get("/reset_password/{token}", response_class=HTMLResponse)
+async def reset_password(request: Request, token: str, db: AsyncSession = Depends(get_db)):
+    """Renders the password reset page."""
+    reset_token = await db.execute(select(ResetConfirmToken).where(ResetConfirmToken.token == token))
+    reset_token = reset_token.scalar_one_or_none()
+    if not reset_token or reset_token.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+        return auth_templates.TemplateResponse(
+            "reset_password.html",
+            {"request": request, "error": "Invalid or expired token", "token": token},
+        )
+    user = await db.execute(select(User).where(User.user_id == reset_token.user_id))
+    user = user.scalar_one_or_none()
+    if not user:
+        return auth_templates.TemplateResponse(
+            "reset_password.html",
+            {"request": request, "error": "User not found", "token": token},
+        )
+
+    return auth_templates.TemplateResponse("reset_password.html", {"request": request, "token": token})
+
+
+@router.post("/reset_password/{token}", response_class=RedirectResponse)
+@limiter.limit("5/minute")
+async def reset_password_user(request: Request, token: str, db: AsyncSession = Depends(get_db)):
+    """Handles password reset. Expects form data with new password."""
+    form_data = await request.form()
+    new_password = form_data.get("new_password")
+    reset_token = await db.execute(select(ResetConfirmToken).where(ResetConfirmToken.token == token))
+    reset_token = reset_token.scalar_one_or_none()
+    if not reset_token or reset_token.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+        return auth_templates.TemplateResponse(
+            "reset_password.html",
+            {"request": request, "error": "Invalid or expired token", "token": token},
+        )
+    user = await db.execute(select(User).where(User.user_id == reset_token.user_id))
+    user = user.scalar_one_or_none()
+    if not user:
+        return auth_templates.TemplateResponse(
+            "reset_password.html",
+            {"request": request, "error": "User not found", "token": token},
+        )
+
+    if check_password_hash(user.password, new_password):
+        return auth_templates.TemplateResponse(
+            "reset_password.html",
+            {"request": request, "error": "New password cannot be the same as the old one", "token": token},
+        )
+    user.password = generate_password_hash(new_password)
+    db.add(user)
+    await db.delete(reset_token)
+    await db.commit()
+    print(f"Password reset for {user.username} ({user.email})")
+    return auth_templates.TemplateResponse("reset_password_success.html", {"request": request})
 
 
 def verify_telegram_auth(data: dict, bot_token: str) -> bool:

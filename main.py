@@ -48,6 +48,8 @@ templates = Jinja2Templates(directory="templates")
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
     if exc.status_code == 404:
         return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
+    # elif exc.status_code == 302:
+    #     return RedirectResponse(url=exc.detail, status_code=302)
     raise exc
 
 
@@ -74,7 +76,7 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
 async def dashboard(
     request: Request,
     sort_by: str = "date",
-    # auth: dict = Depends(require_auth_dependency),
+    auth: dict = Depends(require_auth_dependency),
     db: AsyncSession = Depends(get_db),
 ):
     user_id = request.session.get("user_id")
