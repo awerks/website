@@ -48,6 +48,8 @@ templates = Jinja2Templates(directory="templates")
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
     if exc.status_code == 404:
         return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
+    elif exc.status_code == 500:
+        return templates.TemplateResponse("500.html", {"request": request}, status_code=500)
     # elif exc.status_code == 302:
     #     return RedirectResponse(url=exc.detail, status_code=302)
     raise exc
@@ -166,7 +168,6 @@ async def video(request: Request):
 @app.get("/about")
 async def about(request: Request):
     """Renders the about page."""
-    forwarded_proto = request.headers.get("X-Forwarded-Proto")
     return templates.TemplateResponse("about.html", {"request": request})
 
 

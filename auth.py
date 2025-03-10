@@ -398,6 +398,7 @@ async def reset_password_user(request: Request, token: str, db: AsyncSession = D
     return auth_templates.TemplateResponse("reset_password_success.html", {"request": request})
 
 
+
 def verify_telegram_auth(data: dict, bot_token: str) -> bool:
     """Verifies the integrity of Telegram login data."""
     received_hash = data.pop("hash")
