@@ -1,0 +1,78 @@
+<!-- filepath: /Users/admin/Developer/flask_app/templates/auth/confirm_email.html -->
+{% extends 'base.html' %}
+{% block title %}Confirm Email{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="/static/auth.css">
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="form-container">
+        <h1>Confirm Email</h1>
+        <p>
+            We have sent a confirmation email to your address.
+            Please check your inbox (and spam folder). If you need to change your email,
+            update it below and then click "Resend Confirmation Email".
+        </p>
+        <p>
+            You can resend the confirmation email after
+            <span id="countdown">60</span> seconds.
+        </p>
+        <form method="POST" action="{{ url_for('confirm_email') }}" onsubmit="return validateEmailChange()"
+            style="box-shadow: none; padding: 0;">
+            <div class="form-group">
+                <label for="email">Change Email <span style="color: red;">*</span></label>
+                <div class="input-container">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" name="email" required placeholder="Enter new email address">
+                </div>
+                <small id="email-error" style="color: red; margin-top: 0.5rem; display: none;"></small>
+            </div>
+            {% if error %}
+            <p style="color: red;">{{ error }}</p>
+            {% endif %}
+            <div class="form-group">
+                <button type="submit" id="resend-button" class="button" disabled>Resend Confirmation Email</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<script>
+    function validateEmailChange() {
+        // 
+        const email = document.getElementById('email').value;
+        const errorMessage = document.getElementById('email-error');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(email)) {
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = 'Please enter a valid email address.';
+            return false;
+        } else {
+            errorMessage.style.display = 'none';
+            return true;
+        }
+    }
+
+    const countdownElement = document.getElementById('countdown');
+    const resendButton = document.getElementById('resend-button');
+    let countdown = 60;
+
+    const timer = setInterval(() => {
+        countdown--;
+        if (countdownElement) {
+            countdownElement.textContent = countdown;
+        }
+        if (countdown <= 0) {
+            clearInterval(timer);
+            if (resendButton) {
+                resendButton.disabled = false;
+                // Remove countdown text once the interval finishes.
+                countdownElement.parentElement.innerHTML = '';
+            }
+        }
+    }, 1000);
+</script>
+{% endblock %}

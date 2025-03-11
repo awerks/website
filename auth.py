@@ -326,7 +326,7 @@ async def forgot_password_user(request: Request, db: AsyncSession = Depends(get_
     expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
     db.add(ResetConfirmToken(token=token, user_id=user.user_id, expires_at=expires_at))
     await db.commit()
-    reset_link = request.url_for("reset_password", token=token)
+    reset_link = request.url_for("reset_password", token=token, _scheme="https")
     subject = "Password Reset Request"
     html_body = auth_templates.get_template("reset_password_email.html").render(
         request=request, reset_password_link=reset_link
@@ -396,7 +396,6 @@ async def reset_password_user(request: Request, token: str, db: AsyncSession = D
     await db.commit()
     print(f"Password reset for {user.username} ({user.email})")
     return auth_templates.TemplateResponse("reset_password_success.html", {"request": request})
-
 
 
 def verify_telegram_auth(data: dict, bot_token: str) -> bool:
