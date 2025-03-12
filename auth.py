@@ -170,7 +170,7 @@ async def finalize_google_register(request: Request, db: AsyncSession = Depends(
     await db.commit()
     request.session.pop("google_user_id", None)
     request.session.update({"user_id": google_user_id})
-
+    print("Registering user:", request.session.get("username") or request.session.get("name"))
     return RedirectResponse(url=request.app.url_path_for("login"), status_code=302)
 
 
