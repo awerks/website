@@ -14,6 +14,7 @@ Table "users" {
   "available_minutes" int4 [default: 90]
   "email" text
   "password" text
+  "email_confirmed" bool [default: false]
 }
 
 Table "videos" {
@@ -30,5 +31,13 @@ Table "videos" {
   "original_video_link" text
   "thumbnail_url" text
 }
+
+Table "reset_confirm_tokens" {
+  "token" varchar(36) [pk, not null]
+  "user_id" text
+  "expires_at" timestamp [not null]
+}
+
+Ref "reset_confirm_tokens_user_id_fkey":"users"."user_id" < "reset_confirm_tokens"."user_id"
 
 Ref "videos_user_id_fkey":"users"."user_id" < "videos"."user_id"

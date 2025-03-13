@@ -15,16 +15,21 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import ResetConfirmToken, get_db, User, Video
 from werkzeug.security import generate_password_hash, check_password_hash
 from rate_limiter import limiter
-from utils import send_email
+from sqlalchemy import delete
+from utils import (
+    send_email,
+    verify_telegram_auth,
+    process_token_email,
+    validate_token,
+    get_user_by_email,
+    require_auth_dependency,
+)
 
-FASTAPI_API_TOKEN = getenv("FASTAPI_API_TOKEN", "dev)")
 BOT_TOKEN = getenv("BOT_TOKEN")
 GOOGLE_CLIENT_ID = getenv("GOOGLE_CLIENT_ID", "dev")
 router = APIRouter(prefix="/auth", tags=["auth"])
 auth_templates = Jinja2Templates(directory="templates/auth")
-auth_templates.env.loader = ChoiceLoader(
-    [FileSystemLoader("templates"), FileSystemLoader("templates/auth"), FileSystemLoader("templates/email")]
-)
+auth_templates.env.loader = ChoiceLoader([FileSystemLoader("templates"), FileSystemLoader("templates/auth")])
 
 
 @router.post("/telegram-login")
@@ -59,6 +64,7 @@ async def telegram_login(request: Request, db: AsyncSession = Depends(get_db)):
                 user_id=user_id,
                 username=username,
                 name=name,
+                email_confirmed=False,
             )
         )
         await db.commit()
@@ -91,7 +97,7 @@ async def google_login(request: Request, db: AsyncSession = Depends(get_db)):
     existing_user = await db.execute(select(User.user_id).where(or_(User.email == email, User.user_id == user_id)))
     existing_user_id = existing_user.scalar()
     if not existing_user_id:
-        db.add(User(user_id=user_id, username=username, name=name, email=email))
+        db.add(User(user_id=user_id, username=username, name=name, email=email, email_confirmed=True))
         await db.commit()
 
     request.session.update(
@@ -165,12 +171,14 @@ async def finalize_google_register(request: Request, db: AsyncSession = Depends(
         name=name,
         email=email,
         password=generate_password_hash(password),
+        email_confirmed=True,
     )
     db.add(new_user)
     await db.commit()
     request.session.pop("google_user_id", None)
     request.session.update({"user_id": google_user_id})
     print("Registering user:", request.session.get("username") or request.session.get("name"))
+
     return RedirectResponse(url=request.app.url_path_for("login"), status_code=302)
 
 
@@ -275,7 +283,8 @@ async def register_user(request: Request, db: AsyncSession = Depends(get_db)):
         }
     )
     print("Registering user:", request.session.get("username") or request.session.get("name"))
-    return RedirectResponse(url=request.app.url_path_for("dashboard"), status_code=302)
+
+    return RedirectResponse(url=request.app.url_path_for("confirm_email_page"), status_code=302)
 
 
 @router.get("/check_username", response_class=JSONResponse)
@@ -307,84 +316,153 @@ async def forgot_password(request: Request):
     return auth_templates.TemplateResponse("forgot_password.html", {"request": request})
 
 
+@router.get("/confirm_email", response_class=HTMLResponse)
+@limiter.limit("5/minute")
+async def confirm_email_page(
+    request: Request, db: AsyncSession = Depends(get_db), auth=Depends(require_auth_dependency)
+):
+    """Renders the email confirmation page."""
+    user_id = request.session.get("user_id")
+    email = request.session.get("email")
+
+    return await process_token_email(
+        request=request,
+        db=db,
+        user_id=user_id,
+        email=email,
+        token_route="process_confirm_email",
+        email_template="confirm_email.html",
+        link_param="confirm_email_link",
+        subject="Email Confirmation Request",
+        log_prefix="Email confirmation",
+        success_template="confirm_email.html",
+    )
+
+
+@router.post("/confirm_email", response_class=RedirectResponse)
+@limiter.limit("5/minute")
+async def confirm_email(request: Request, db: AsyncSession = Depends(get_db), email: str = None):
+    """Handles email confirmation requests. Expects form data with email."""
+    form_data = await request.form()
+    email = form_data.get("email")
+
+    user = await db.execute(select(User).where(User.user_id == request.session.get("user_id")))
+    user = user.scalar_one_or_none()
+    if not user:
+        return auth_templates.TemplateResponse(
+            "confirm_email.html",
+            {"request": request, "error": "User is not found", "email": email},
+        )
+    if user.email_confirmed:
+        return auth_templates.TemplateResponse(
+            "confirm_email.html",
+            {"request": request, "error": "Email is already confirmed", "email": email},
+        )
+    # if email already in use
+    existing_user = await db.execute(select(User).where(User.email == email))
+    existing_user = existing_user.scalar_one_or_none()
+    if existing_user and existing_user.user_id != user.user_id:
+        return auth_templates.TemplateResponse(
+            "confirm_email.html",
+            {"request": request, "email_in_use": "Email is already in use", "email": email},
+        )
+    # change email to new
+    user.email = email
+    db.add(user)
+    await db.execute(delete(ResetConfirmToken).where(ResetConfirmToken.user_id == user.user_id))
+    await db.commit()
+
+    return await process_token_email(
+        request=request,
+        db=db,
+        user_id=user.user_id,
+        email=email,
+        token_route="process_confirm_email",
+        email_template="confirm_email.html",
+        link_param="confirm_email_link",
+        subject="Email Confirmation Request",
+        log_prefix="Email confirmation",
+        success_message="Email confirmation resent",
+        success_template="confirm_email.html",
+    )
+
+
+@router.get("/confirm_email/{token}", response_class=HTMLResponse)
+async def process_confirm_email(request: Request, token: str, db: AsyncSession = Depends(get_db)):
+    """Handles email confirmation token processing. Expects a token in the URL."""
+    token_record, user = await validate_token(db, token)
+    if not token_record or not user:
+        return auth_templates.TemplateResponse(
+            "confirm_email.html",
+            {"request": request, "error": "Invalid or expired token", "token": token},
+        )
+    user.email_confirmed = True
+    db.add(user)
+    await db.delete(token_record)
+    await db.commit()
+    print(f"Email confirmed for {user.username} ({user.email})")
+
+    return auth_templates.TemplateResponse(
+        "confirm_email_success.html", {"request": request, "message": "Email confirmed successfully"}
+    )
+
+
 @router.post("/forgot_password", response_class=RedirectResponse)
 @limiter.limit("5/minute")
 async def forgot_password_user(request: Request, db: AsyncSession = Depends(get_db)):
-    """Handles password reset request. Expects form data with email."""
+    """Handles password reset requests. Expects form data with email."""
     form_data = await request.form()
-    email = form_data.get("email").lower()
-    user = await db.execute(select(User).where(User.email == email))
-    user = user.scalar()
+    email = form_data.get("email")
+    user = await get_user_by_email(db, email)
     if not user:
         return auth_templates.TemplateResponse(
             "forgot_password.html",
             {"request": request, "error": "Email not found", "email": email},
         )
-
-    print(f"Password reset requested for {user.username} ({user.email})")
-    token = str(uuid.uuid4())
-    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
-    db.add(ResetConfirmToken(token=token, user_id=user.user_id, expires_at=expires_at))
-    await db.commit()
-    reset_link = request.url_for("reset_password", token=token, _scheme="https")
-    subject = "Password Reset Request"
-    html_body = auth_templates.get_template("reset_password_email.html").render(
-        request=request, reset_password_link=reset_link
-    )
-    await send_email(to_address=email, subject=subject, html_body=html_body)
-    print("Sending password reset email to:", email)
-    return auth_templates.TemplateResponse(
-        "forgot_password.html",
-        {
-            "request": request,
-            "message": "Password reset email sent",
-            "email": email,
-        },
+    return await process_token_email(
+        request=request,
+        db=db,
+        user_id=user.user_id,
+        email=email,
+        token_route="reset_password",
+        email_template="reset_password_email.html",
+        link_param="reset_password_link",
+        subject="Password Reset Request",
+        log_prefix="Password reset",
+        success_message="Password reset email sent",
+        success_template="forgot_password.html",
     )
 
 
 @router.get("/reset_password/{token}", response_class=HTMLResponse)
 async def reset_password(request: Request, token: str, db: AsyncSession = Depends(get_db)):
-    """Renders the password reset page."""
-    reset_token = await db.execute(select(ResetConfirmToken).where(ResetConfirmToken.token == token))
-    reset_token = reset_token.scalar_one_or_none()
-    if not reset_token or reset_token.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+    """Renders the password reset page. Expects a token in the URL."""
+    token_record, user = await validate_token(db, token)
+    if not token_record:
         return auth_templates.TemplateResponse(
             "reset_password.html",
             {"request": request, "error": "Invalid or expired token", "token": token},
         )
-    user = await db.execute(select(User).where(User.user_id == reset_token.user_id))
-    user = user.scalar_one_or_none()
-    if not user:
-        return auth_templates.TemplateResponse(
-            "reset_password.html",
-            {"request": request, "error": "User not found", "token": token},
-        )
-
     return auth_templates.TemplateResponse("reset_password.html", {"request": request, "token": token})
 
 
 @router.post("/reset_password/{token}", response_class=RedirectResponse)
 @limiter.limit("5/minute")
 async def reset_password_user(request: Request, token: str, db: AsyncSession = Depends(get_db)):
-    """Handles password reset. Expects form data with new password."""
+    """Handles password reset. Expects form data with new password and a token in the URL."""
     form_data = await request.form()
     new_password = form_data.get("new_password")
-    reset_token = await db.execute(select(ResetConfirmToken).where(ResetConfirmToken.token == token))
-    reset_token = reset_token.scalar_one_or_none()
-    if not reset_token or reset_token.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
+    token_record, user = await validate_token(db, token)
+    if not token_record:
         return auth_templates.TemplateResponse(
             "reset_password.html",
             {"request": request, "error": "Invalid or expired token", "token": token},
         )
-    user = await db.execute(select(User).where(User.user_id == reset_token.user_id))
-    user = user.scalar_one_or_none()
     if not user:
         return auth_templates.TemplateResponse(
             "reset_password.html",
             {"request": request, "error": "User not found", "token": token},
         )
-
     if check_password_hash(user.password, new_password):
         return auth_templates.TemplateResponse(
             "reset_password.html",
@@ -392,33 +470,7 @@ async def reset_password_user(request: Request, token: str, db: AsyncSession = D
         )
     user.password = generate_password_hash(new_password)
     db.add(user)
-    await db.delete(reset_token)
+    await db.delete(token_record)
     await db.commit()
     print(f"Password reset for {user.username} ({user.email})")
     return auth_templates.TemplateResponse("reset_password_success.html", {"request": request})
-
-
-def verify_telegram_auth(data: dict, bot_token: str) -> bool:
-    """Verifies the integrity of Telegram login data."""
-    received_hash = data.pop("hash")
-    data_check_string = "\n".join(f"{k}={data[k]}" for k in sorted(data.keys()))
-    secret_key = hashlib.sha256(bot_token.encode()).digest()
-    computed_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
-    return computed_hash == received_hash
-
-
-def require_token_dependency(request: Request):
-    """Dependency to require a valid API token in the Authorization header."""
-    token = request.headers.get("Authorization")
-    if token != FASTAPI_API_TOKEN:
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    return token
-
-
-def require_auth_dependency(request: Request):
-    """Dependency to ensure the user is authenticated (via session)."""
-    if "user_id" not in request.session:
-        raise HTTPException(
-            status_code=302, detail="Not authenticated", headers={"Location": request.app.url_path_for("login")}
-        )
-    return request.session

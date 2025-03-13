@@ -4,6 +4,22 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="/static/auth.css">
+<style>
+    /* style disabled button */
+    #resend-button:disabled {
+        background-color: #e0e0e0;
+        color: #888;
+        border: 1px solid #ccc;
+        cursor: not-allowed;
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+        opacity: 0.7;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .form-container h1 {
+        padding: 1rem;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -12,12 +28,11 @@
         <h1>Confirm Email</h1>
         <p>
             We have sent a confirmation email to your address.
-            Please check your inbox (and spam folder). If you need to change your email,
-            update it below and then click "Resend Confirmation Email".
+            Please check your inbox (and spam folder).
         </p>
         <p>
             You can resend the confirmation email after
-            <span id="countdown">60</span> seconds.
+            <span id="countdown" style="font-weight:bold;">30</span> seconds.
         </p>
         <form method="POST" action="{{ url_for('confirm_email') }}" onsubmit="return validateEmailChange()"
             style="box-shadow: none; padding: 0;">
@@ -25,13 +40,18 @@
                 <label for="email">Change Email <span style="color: red;">*</span></label>
                 <div class="input-container">
                     <i class="fas fa-envelope"></i>
-                    <input type="email" id="email" name="email" required placeholder="Enter new email address">
+                    <input type="email" id="email" name="email" required placeholder="Enter new email address"
+                        value="{{ email | default('') }}" maxlength="50">
                 </div>
                 <small id="email-error" style="color: red; margin-top: 0.5rem; display: none;"></small>
             </div>
-            {% if error %}
+            {% if error or email_in_use %}
             <p style="color: red;">{{ error }}</p>
             {% endif %}
+            {% if message %}
+            <p style="color: green;">{{ message }}</p>
+            {% endif %}
+
             <div class="form-group">
                 <button type="submit" id="resend-button" class="button" disabled>Resend Confirmation Email</button>
             </div>
@@ -55,10 +75,10 @@
             return true;
         }
     }
-
+    {% if not error %}
     const countdownElement = document.getElementById('countdown');
     const resendButton = document.getElementById('resend-button');
-    let countdown = 60;
+    let countdown = 30;
 
     const timer = setInterval(() => {
         countdown--;
@@ -74,5 +94,7 @@
             }
         }
     }, 1000);
+    {% endif %}
+
 </script>
 {% endblock %}

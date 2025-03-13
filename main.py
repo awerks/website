@@ -7,7 +7,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy import func, select, text
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
-from auth import require_token_dependency, require_auth_dependency, router as auth_router
+from auth import router as auth_router
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from database import User, Video, get_db
@@ -15,6 +15,7 @@ from slowapi.errors import RateLimitExceeded
 from rate_limiter import get_real_ip, limiter
 from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
+from utils import require_token_dependency, require_auth_dependency
 
 FASTAPI_SECRET_KEY = os.getenv("FASTAPI_SECRET_KEY", "dev")
 FASTAPI_API_TOKEN = os.getenv("FASTAPI_API_TOKEN", "dev")
@@ -46,13 +47,32 @@ templates = Jinja2Templates(directory="templates")
 
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
-    if exc.status_code == 404:
-        return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
-    elif exc.status_code == 500:
-        return templates.TemplateResponse("500.html", {"request": request}, status_code=500)
-    # elif exc.status_code == 302:
-    #     return RedirectResponse(url=exc.detail, status_code=302)
-    raise exc
+
+    if exc.status_code == 401:
+        return RedirectResponse(request.url_for("login"), status_code=302)
+
+    error_data = {
+        404: (
+            "Oops! This page does not exist.",
+            ["The page you're looking for might have been removed or is temporarily unavailable."],
+            "error.html",
+        ),
+        500: (
+            "Oops! Something went wrong.",
+            ["The server encountered an internal error and was unable to complete your request."],
+            "error.html",
+        ),
+    }
+    header_message, paragraphs, template = error_data.get(
+        exc.status_code, ("Error", ["An error occurred while processing your request."], "error.html")
+    )
+    if exc.detail:
+        paragraphs.append(f"Details: {exc.detail}")
+    return templates.TemplateResponse(
+        template,
+        {"request": request, "header_message": header_message, "paragraphs": paragraphs},
+        status_code=exc.status_code,
+    )
 
 
 class RequestIPMiddleware(BaseHTTPMiddleware):

@@ -1,0 +1,61 @@
+<!-- filepath: /Users/admin/Developer/flask_app/templates/auth/confirm_email_success.html -->
+{% extends "base.html" %}
+{% block title %}Email Confirmed{% endblock %}
+
+{% block extra_head %}
+<style>
+    .confirm-container {
+        background: var(--background);
+        border-radius: 8px;
+        padding: 2rem;
+        margin: 10rem auto 0;
+        max-width: 500px;
+        box-shadow: var(--card-shadow);
+        text-align: center;
+        border-radius: 20px;
+    }
+
+    .confirm-container i {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+    }
+
+    .confirm-container h1 {
+        margin-bottom: 1rem;
+        color: var(--primary);
+    }
+
+    .confirm-container p {
+        margin-bottom: 1.5rem;
+        color: var(--text);
+        font-size: 1.1rem;
+    }
+
+    .confirm-container .button {
+        display: inline-block;
+        text-decoration: none;
+        padding: 10px 20px;
+        background: var(--primary);
+        color: var(--background);
+        border-radius: 6px;
+        font-weight: 600;
+        transition: background 0.3s ease;
+    }
+
+    .confirm-container .button:hover {
+        background: var(--accent);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main>
+    <section class="confirm-container">
+        <i class="fas fa-check-circle"></i>
+        <h1>Email Confirmed!</h1>
+        <p>Your email has been successfully confirmed. You can now log in to your account.</p>
+        <a href="{{ url_for('dashboard') }}" class="button">Proceed</a>
+    </section>
+</main>
+{% endblock %}

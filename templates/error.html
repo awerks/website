@@ -10,9 +10,11 @@
     justify-content: center; 
     text-align: center;
 ">
-    <h1 style="color:var(--primary)">Oops! Something went wrong on our end.</h1>
+    <h1>{{ header_message }}</h1>
     <hr style="align-self: stretch; margin: 1rem 0;">
-    <p>There was a problem processing your request. Please try again later.</p>
+    {% for p in paragraphs %}
+    <p>{{ p }}</p>
+    {% endfor %}
     <p>If the problem persists, please email us at <strong><a
                 href="mailto:support@captionyx.com">support@captionyx.com</a></strong></p>
 </main>

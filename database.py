@@ -29,6 +29,7 @@ class User(Base):
     name = Column(String)
     email = Column(String)
     password = Column(String)
+    email_confirmed = Column(Boolean, server_default=text("false"))
     start_time_utc = Column(TIMESTAMP(timezone=True))
     bot_language = Column(String, server_default=text("'en'"))
     user_font_size = Column(String, server_default=text("'default'"))

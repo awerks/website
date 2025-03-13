@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Welcome to Captionyx - Generate subtitles easily" />
+    <meta property="og:author" content="Captionyx">
+    <title>Confirm Your Email</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --text: #09050a;
+            --background: #f7f3f8;
+            --primary: #985bb9;
+            --accent: #ab72ca;
+            --footer-bg: #fafafa;
+            --footer-border: #e0e0e0;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: var(--background);
+            font-family: 'Poppins', sans-serif;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 600px;
+            background: #fff;
+            margin: 40px auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 25px;
+        }
+
+        .header i {
+            font-size: 40px;
+            color: var(--primary);
+        }
+
+        h1 {
+            margin: 20px 0 10px;
+            font-size: 26px;
+            color: var(--primary);
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 0 0 25px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--accent);
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--primary);
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid var(--footer-border);
+            font-size: 13px;
+            color: #777;
+        }
+
+        .footer a {
+            color: #777;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .expiry {
+            margin-bottom: 10px;
+        }
+
+        @media only screen and (max-width: 620px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <i class="fas fa-lock"></i>
+        </div>
+        <h1>Confirm Your Email</h1>
+        <p>
+            Thanks for signing up! Please click the button below to confirm your email address.
+            If you did not create an account, please ignore this message.
+        </p>
+        <a href="{{ confirm_email_link }}" class="btn">Confirm Email</a>
+        <div class="footer">
+            <div class="expiry">This link will expire in <strong>1 hour</strong>.</div>
+            <div class="captionyx">
+                <p><a href="https://captionyx.com">© Captionyx</a> | All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
