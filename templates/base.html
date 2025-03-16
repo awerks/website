@@ -86,18 +86,18 @@
                 <i class="fas fa-bars"></i>
             </label>
             <nav>
-                <a href="/#features" style="margin-right: 15px;">Features</a>
-                <a href="/about" style="margin-right: 15px;">About</a>
-                <a href="/privacy" style="margin-right: 15px;">Privacy</a>
+                <a href="/">Features</a>
+                <a href="/about">About</a>
+                <a href="/privacy">Privacy</a>
 
                 {% if 'user_id' not in request.session %}
                 <!-- solving subdomain issue (can't add more than one domain) -->
-                <a href="/auth/login" style="margin-right: 15px;">Login</a>
-                <a href="/auth/register" style="margin-right: 15px;">Register</a>
+                <a href="/auth/login">Login</a>
+                <a href="/auth/register">Register</a>
                 {% else %}
-                <a href="/dashboard" style="margin-right: 15px;">Dashboard</a>
+                <a href="/dashboard">Dashboard</a>
 
-                <a href="/auth/logout" style="margin-right: 15px;">Logout</a>
+                <a href="/auth/logout">Logout</a>
                 {% endif %}
 
                 <a href="#" onclick="toggleTheme()" class="theme-toggle" title="Toggle Theme">

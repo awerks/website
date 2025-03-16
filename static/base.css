@@ -79,6 +79,11 @@ header {
     color: var(--text);
 }
 
+:root[data-theme="dark"] a:hover {
+    color: var(--primary);
+
+}
+
 main {
     flex: 1;
     max-width: 1000px;
@@ -171,7 +176,7 @@ main section p {
 nav {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 35px;
 }
 
 nav a {
@@ -181,7 +186,7 @@ nav a {
 }
 
 nav a:hover {
-    color: var(--accent);
+    color: #333;
 }
 
 .theme-toggle {
@@ -270,6 +275,7 @@ footer a.github-link:hover {
         font-size: 1.5rem;
         text-align: center;
     }
+
 
 
     #nav-toggle:checked~nav {

@@ -17,6 +17,7 @@ from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from utils import require_token_dependency, require_auth_dependency
 
+
 FASTAPI_SECRET_KEY = os.getenv("FASTAPI_SECRET_KEY", "dev")
 FASTAPI_API_TOKEN = os.getenv("FASTAPI_API_TOKEN", "dev")
 MOUNT_DIRECTORY = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
@@ -62,6 +63,11 @@ async def custom_http_exception_handler(request: Request, exc: StarletteHTTPExce
             ["The server encountered an internal error and was unable to complete your request."],
             "error.html",
         ),
+        429: (
+            "Rate Limit Exceeded",
+            ["You are being rate limited. Please try again later."],
+            "error.html",
+        ),
     }
     header_message, paragraphs, template = error_data.get(
         exc.status_code, ("Error", ["An error occurred while processing your request."], "error.html")
@@ -90,21 +96,30 @@ app.add_middleware(RequestIPMiddleware)
 
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
-    return JSONResponse({"detail": "Rate limit exceeded. Please try again later."}, status_code=429)
+    return templates.TemplateResponse(
+        "error.html",
+        {
+            "request": request,
+            "header_message": "Rate Limit Exceeded",
+            "paragraphs": ["You are being rate limited. Slow down your requests."],
+        },
+        status_code=429,
+    )
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
-@limiter.limit("10/minute")
+@limiter.limit("20/minute")
 async def dashboard(
     request: Request,
     sort_by: str = "date",
     auth: dict = Depends(require_auth_dependency),
     db: AsyncSession = Depends(get_db),
 ):
+
     user_id = request.session.get("user_id")
     first_name = request.session.get("first_name")
     username = request.session.get("username")
-    photo_url = request.session.get("photo_url")
+    photo_url = request.session.get("photo_url")    
 
     if app.debug:
         user_id = "631745148"

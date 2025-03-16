@@ -85,6 +85,7 @@ async def google_login(request: Request, db: AsyncSession = Depends(get_db)):
         user = google.oauth2.id_token.verify_oauth2_token(token, request_adapter, GOOGLE_CLIENT_ID)
     except Exception as e:
         print("Error decoding token:", e)
+
         return JSONResponse({"error": "Error decoding token"}, status_code=400)
 
     user_id = str(user.get("sub"))
