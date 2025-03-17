@@ -79,7 +79,7 @@ header {
     color: var(--text);
 }
 
-:root[data-theme="dark"] a:hover {
+:root[data-theme="dark"] nav a:hover {
     color: var(--primary);
 
 }
@@ -103,6 +103,7 @@ body {
 a {
     text-decoration: none;
     color: inherit;
+    transition: color 0.3s ease;
 }
 
 main section {
@@ -182,7 +183,6 @@ nav {
 nav a {
     font-size: 1.1rem;
     color: var(--background);
-    transition: color 0.3s ease;
 }
 
 nav a:hover {

@@ -119,7 +119,7 @@ async def dashboard(
     user_id = request.session.get("user_id")
     first_name = request.session.get("first_name")
     username = request.session.get("username")
-    photo_url = request.session.get("photo_url")    
+    photo_url = request.session.get("photo_url")
 
     if app.debug:
         user_id = "631745148"

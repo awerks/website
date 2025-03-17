@@ -3,13 +3,6 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="/static/auth.css">
-<script>
-    (function () {
-        var buttonType = window.innerWidth < 600 ? 'icon' : 'standard';
-        window.googleSignInConfig = {
-            type: buttonType,
-        };
-    })();
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
@@ -64,7 +57,13 @@
                     </script>
             </div>
             <div class="social-button" id="google-login-button">
-                <div id="google-signin-container"></div>
+                <div id="g_id_onload"
+                    data-client_id="612951769125-keb4f56moc9g8il5vs8ks040hcdkmnfq.apps.googleusercontent.com"
+                    data-login_uri="/auth/google_login" data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin" data-type="icon" data-size="large" + data-theme="outline"
+                    data-text="sign_in_with" data-shape="circle" data-logo_alignment="left">
+                </div>
             </div>
         </div>
         </form>
@@ -86,32 +85,8 @@
                         return response.json();
                     }
                 })
-                .then(data => {
-                    if (data && data.redirect_url) {
-                        window.location.href = data.redirect_url;
-                    }
-                })
                 .catch(error => console.error('Error:', error));
         }
-        // show icon on mobile, standard on desktop
-        document.addEventListener("DOMContentLoaded", function () {
-            var config = window.googleSignInConfig || { type: 'standard' };
-            var googleButtonHTML =
-                '<div id="g_id_onload" ' +
-                'data-client_id="612951769125-keb4f56moc9g8il5vs8ks040hcdkmnfq.apps.googleusercontent.com" ' +
-                'data-login_uri="/auth/google_login" ' +
-                'data-auto_prompt="false">' +
-                '</div>' +
-                '<div class="g_id_signin" ' +
-                'data-type="' + config.type + '" ' +
-                'data-size=large"' +
-                'data-theme="outline" ' +
-                'data-text="sign_in_with" ' +
-                'data-shape="circle" ' +
-                'data-logo_alignment="left">' +
-                '</div>';
-            document.getElementById('google-signin-container').innerHTML = googleButtonHTML;
-        });
     </script>
 </main>
 

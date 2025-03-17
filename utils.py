@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, Request
 from database import ResetConfirmToken, User
 
-FASTAPI_API_TOKEN = os.getenv("FASTAPI_API", "dev")
+FASTAPI_API_TOKEN = os.getenv("FASTAPI_API_TOKEN", "dev")
 auth_templates = Jinja2Templates(directory="templates/auth")
 auth_templates.env.loader = ChoiceLoader([FileSystemLoader("templates"), FileSystemLoader("templates/auth")])
 email_templates = Jinja2Templates(directory="templates/email")
