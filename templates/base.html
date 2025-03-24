@@ -73,6 +73,25 @@
         }
         document.addEventListener('DOMContentLoaded', updateThemeIcon);
     </script>
+    <script type="text/javascript">
+        window.Muscula = {
+            logId: '0MFDgKwCjD1',
+            errors: [],
+        };
+        window.Muscula.onerrorOriginalHandler = window.onerror;
+        window.onerror = function () {
+            window.Muscula.errors.push(arguments);
+            return false;
+        };
+
+        (function () {
+            var m = document.createElement('script');
+            m.async = true;
+            m.src = 'https://cdn.muscula.com/m2v2.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(m, s);
+        })();
+    </script>
 </head>
 
 <body>
