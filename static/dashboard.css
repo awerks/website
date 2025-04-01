@@ -1,5 +1,5 @@
 main.dashboard {
-    max-width: 1200px;
+    max-width: 100%;
     padding: 2rem 0;
     background: var(--background);
     border-radius: 12px;
@@ -15,7 +15,7 @@ main.dashboard {
 }
 
 .profile-card {
-    flex: 1 1 250px;
+    flex: 0 1 300px;
     text-align: center;
     background: var(--secondary);
     padding: 1.5rem;
